@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <style type="text/css">
+      .tdp-vld-msg {
+				position: relative;
+				padding: 3px;
+				background: #FFFFFF;
+				-webkit-border-radius: 1px;
+				-moz-border-radius: 1px;
+				border-radius: 1px;
+				border: #FF0000 solid 1px;
+				color: red;
+				margin: 10px;
+			}
+
+			.tdp-vld-msg:after {
+				content: '';
+				position: absolute;
+				border-style: solid;
+				border-width: 5px 10px 5px 0;
+				border-color: transparent #FFFFFF;
+				display: block;
+				width: 0;
+				z-index: 1;
+				left: -9px;
+				top: 3px;
+			}
+
+			.tdp-vld-msg:before {
+				content: '';
+				position: absolute;
+				border-style: solid;
+				border-width: 5px 10px 5px 0;
+				border-color: transparent #FF0000;
+				display: block;
+				width: 0;
+				z-index: 0;
+				left: -11px;
+				top: 3px;
+			}
+    </style>
+  </head>
+  <body>
+		<form id="form01" method="POST">
+			Name: <input name="name" type="text" /><br />
+			Surname: <input name="surname" type="text" /><br />
+			Sex: <select name="sex"></select><br />
+			Phone number: <input name="phone" type="tel" /><br />
+			Age: <input name="age" type="number" /><br />
+			Email: <input name="email" type="email" /><br />
+			<input type="submit" name="submit" value="odeslat" />
+		</form>
+		<br />
+		<textarea class="console">MESSAGES:
+		</textarea>
+		<script async="" src="../tdp.js"></script>
+		<script>
+			$(function() {
+				$('form#form01').tdp({
+					validationMessageSeparator: ' + ',
+					validationMessageFlashDelay: 250,
+					logger: 'textarea.console'
+				}, {
+					values: {
+						name: {
+							value: '',
+							type: 'text',
+							conditions: [
+								{type: 'min', value: 5, message: 'value of input 1 is too short'},
+								{type: 'max', value: 3, message: 'value of input 1 is too long'}
+							]
+						},
+						surname: {
+							value: '',
+							type: 'text',
+							conditions: [
+								{type: 'min', value: 3, message: 'value of input 2 is too short'},
+								{type: 'max', value: 5, message: 'value of input 2 is too long'}
+							]
+						},
+						sex: {
+							value: '',
+							type: 'select',
+							values: [
+								['', 'please select', 0],
+								[1, 'male', 1],
+								[2, 'female', 1]
+							],
+							conditions: [
+								{type: 'not', value: '', message: 'Select your sex'}
+							]
+						},
+						phone: {
+							value: '',
+							type: 'text',
+							conditions: [
+								{type: 'regular', value: '^\\+', message: 'Please use phone number in international format (+XXX)', last: true},
+								{type: 'min', value: 9, message: 'Phone number is too short'},
+				 				{type: 'regular', value: '^\\+([0-9]\\ *){10,12}$', message: 'Invalid phone number format'}
+							]
+						},
+						age: {
+							value: '',
+							type: 'integer',
+							conditions: [
+								{type: 'valid', value: NaN, message: 'Enter integer number (round your age to the whole years)', last: true},
+								{type: 'min', value: 3, message: 'Are you really this old? You are kidding me...', last: true},
+								{type: 'min', value: 15, message: 'Better keep drinking milk and do not go further'},
+								{type: 'min', value: 18, message: 'You are too young to click the button'},
+								{type: 'max', value: 40, message: 'You are to old to go this way'}
+							]
+						},
+						email: {
+							value: '',
+							type: 'email',
+							conditions: [
+								{type: 'validator', value: 'http://some.domain.com/validator/email', message: 'Error validating email address'},
+							]
+						}
+					}
+				});
+			});
+		</script>
+  </body>
+</html>
