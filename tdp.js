@@ -20,7 +20,7 @@ https://github.com/fra-iesus/tdp
 			validationOkHide: function(el) {
 				return el.fadeOut('fast');
 			},
-			validationWorkingElement: 'div.tdp-vld-working',
+			validationWorkingElement: 'span.tdp-vld-working',
 			validationWorkingShow: function(el) {
 				return el.fadeIn('slow');
 			},
@@ -143,22 +143,38 @@ https://github.com/fra-iesus/tdp
 			input.match = match;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
-				if (input.type === 'select' && input.values) {
-					// for select set allowed values if defined
-					$el.find("option").remove();
-					input.values.some(function(entry) {
-						var setting = [];
-						if( typeof entry === 'string' ) {
-							setting = [entry, entry, false];
-						} else {
-							setting = [ entry[0], (entry.length > 1 ? entry[1] : entry[0]), (entry.length > 2 ? !entry[2] : false)];
+				if (input.type === 'select') {
+					if (input.interval || input.values) {
+						// for select set allowed values if defined
+						input_element.find("option").remove();
+						if (input.values) {
+							input.values.some(function(entry) {
+								var setting = [];
+								if( typeof entry === 'string' ) {
+									setting = [entry, entry, false];
+								} else {
+									setting = [ entry[0], (entry.length > 1 ? entry[1] : entry[0]), (entry.length > 2 ? !entry[2] : false)];
+								}
+								var option = createElement('option', entry[1]).attr("value",entry[0]);
+								if (entry[2]) {
+									option.attr("disabled");
+								}
+								input_element.append(option);
+							});
 						}
-						var option = createElement('option', entry[1]).attr("value",entry[0]);
-						if (entry[2]) {
-							option.attr("disabled");
+						if (input.interval) {
+							var min = input.interval[0];
+							var max = input.interval[1];
+							var inc = (min < max) ? 1 : -1;
+							if (input.interval.length > 2) {
+								inc *= input.interval[2];
+							}
+							var index;
+							for (index = min; index * inc <= max * inc; index += inc ) {
+								input_element.append(createElement('option', index).attr("value",index));
+							}
 						}
-						input_element.append(option);
-					});
+					}
 				}
 				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
 					input_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
