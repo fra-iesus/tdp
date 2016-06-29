@@ -132,12 +132,14 @@ https://github.com/fra-iesus/tdp
 			input.validated = null;
 			input.old_value = null;
 			var match = false;
-			input.conditions.some(function(entry) {
-				if (entry.type === 'match') {
-					match = entry.value;
-					return;
-				}
-			});
+			if (input.conditions && input.conditions.length) {
+				input.conditions.some(function(entry) {
+					if (entry.type === 'match') {
+						match = entry.value;
+						return;
+					}
+				});
+			}
 			input.match = match;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
