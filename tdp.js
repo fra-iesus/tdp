@@ -354,8 +354,6 @@ https://github.com/fra-iesus/tdp
 								}
 								if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
 									// todo: add compatison for strings
-									console.log(date);
-									console.log(date.getFullYear() + ' ' + date.getMonth() + ' ' + date.getDate());
 									if (date.getFullYear() == getValue(entry.value[0]) &&
 										date.getMonth() == getValue(entry.value[1])-1 &&
 										date.getDate() == getValue(entry.value[2])) {
@@ -364,7 +362,6 @@ https://github.com/fra-iesus/tdp
 										result = false;
 									}
 								} else {
-									console.log('not a date');
 									result = false;
 								}
 								break;
