@@ -20,7 +20,7 @@ https://github.com/fra-iesus/tdp
 			validationOkHide: function(el) {
 				return el.fadeOut('fast');
 			},
-			validationWorkingElement: 'span.tdp-vld-working',
+			validationWorkingElement: 'div.tdp-vld-working',
 			validationWorkingShow: function(el) {
 				return el.fadeIn('slow');
 			},
@@ -163,10 +163,14 @@ https://github.com/fra-iesus/tdp
 				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
 					input_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
 						after(createElement(self.options('validationOkElement'), '✓').attr('name', key).hide());
+				} else {
+					self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
+					self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
+				}
+				if (!$(self.options('validationWorkingElement') + '[name="' + key + '"]').length) {
+					input_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 				}
 				input_element.val(input.value);
-				self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
-				self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
 				input_element.on('input', function() {
 					self.validate(this, ['validator', 'min', 'not', 'match']);
 				});
