@@ -375,7 +375,7 @@ https://github.com/fra-iesus/tdp
 					// $(this.options('validationMessageElement') + '[name="' + name + '"]').html(result);
 					if (!result) {
 						this.options('validationMessageHide')(validation_msg);
-						if (!skip_validators && !later) {
+						if (!skip_validators && !later && !(definition.match && !this._parameters.values[definition.match].validated)) {
 							this.options('validationOkShow')(validation_ok);
 						}
 					} else {
