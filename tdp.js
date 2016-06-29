@@ -118,11 +118,27 @@ https://github.com/fra-iesus/tdp
 			return $(newelement).html(html);
 		}
 
+		//get value from input name
+		function getValue(name) {
+			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+			if (element.length) {
+				return element.val();
+			}
+		}
+
 		// validator
 		Object.keys(this._parameters.values).forEach(function(key) {
 			var input = self._parameters.values[key];
 			input.validated = null;
 			input.old_value = null;
+			var match = false;
+			input.conditions.some(function(entry) {
+				if (entry.type === 'match') {
+					match = entry.value;
+					return;
+				}
+			});
+			input.match = match;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
 				if (input.type === 'select' && input.values) {
@@ -150,7 +166,7 @@ https://github.com/fra-iesus/tdp
 				self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
 				self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
 				input_element.on('input', function() {
-					self.validate(this, ['validator', 'min', 'not']);
+					self.validate(this, ['validator', 'min', 'not', 'match']);
 				});
 				input_element.on('change, blur', function() {
 					self.validate(this);
@@ -167,17 +183,19 @@ https://github.com/fra-iesus/tdp
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
-				if (!input.validated) {
+				if (!input.validated || input.match) {
 					var element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').first();
-					if (input.validated === null) {
+					if (input.validated === null || input.match) {
 						self.validate(element);
 					}
 					if (!errElement) {
 						errElement = element;
 					}
-					setTimeout( function() {
-						self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
-					}, self.options('validationMessageFlashDelay')*i++);
+					if (!input.validated) {
+						setTimeout( function() {
+							self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
+						}, self.options('validationMessageFlashDelay')*i++);
+					}
 				}
 			});
 			if (errElement) {
@@ -217,7 +235,13 @@ https://github.com/fra-iesus/tdp
 					var validation_ok = $(self.options('validationOkElement') + '[name="' + name + '"]').first();
 					var definition = this._parameters.values[name];
 					if (value === definition.old_value) {
-						return;
+						if (definition.match) {
+							if (getValue(this._parameters.values[definition.match]) == value) {
+								return;
+							}
+						} else {
+							return;
+						}
 					}
 					if (!skip_validators) {
 						definition.old_value = value;
@@ -237,6 +261,7 @@ https://github.com/fra-iesus/tdp
 						switch (definition.type) {
 							case 'tel':
 							case 'email':
+							case 'password':
 							case 'text':
 								t1 = value.length;
 								t2 = entry.value;
@@ -286,6 +311,9 @@ https://github.com/fra-iesus/tdp
 								break;
 							case 'max':
 								result = !Number.isNaN(t1) && t1 <= t2;
+								break;
+							case 'match':
+								result = value == getValue(entry.value);
 								break;
 							case 'validator':
 								self.options('validationWorkingShow')($(self.options('validationWorkingElement') + '[name="' + name + '"]').first());
