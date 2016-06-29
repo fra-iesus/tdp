@@ -132,15 +132,21 @@ https://github.com/fra-iesus/tdp
 			input.validated = null;
 			input.old_value = null;
 			var match = false;
+			var revalidate = false;
 			if (input.conditions && input.conditions.length) {
 				input.conditions.some(function(entry) {
 					if (entry.type === 'match') {
 						match = entry.value;
+						revalidate = true;
+						return;
+					} else if (entry.type === 'date') {
+						revalidate = true;
 						return;
 					}
 				});
 			}
 			input.match = match;
+			input.revalidate = revalidate;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
 				if (input.type === 'select') {
@@ -188,10 +194,10 @@ https://github.com/fra-iesus/tdp
 				}
 				input_element.val(input.value);
 				input_element.on('input', function() {
-					self.validate(this, ['validator', 'min', 'not', 'match']);
+					self.validate(this, ['validator', 'min', 'not', 'match', 'date']);
 				});
 				input_element.on('change, blur', function() {
-					self.validate(this);
+					self.validate(this, ['date']);
 				});
 			});
 		});
@@ -205,9 +211,9 @@ https://github.com/fra-iesus/tdp
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
-				if (!input.validated || input.match) {
+				if (!input.validated || input.revalidate) {
 					var element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').first();
-					if (input.validated === null || input.match) {
+					if (input.validated === null || input.revalidate) {
 						self.validate(element);
 					}
 					if (!errElement) {
@@ -262,7 +268,9 @@ https://github.com/fra-iesus/tdp
 								return;
 							}
 						} else {
-							return;
+							if (!definition.revalidate) {
+								return;
+							}
 						}
 					}
 					if (!skip_validators) {
@@ -337,6 +345,29 @@ https://github.com/fra-iesus/tdp
 							case 'match':
 								result = value == getValue(entry.value);
 								break;
+							case 'date':
+								var date;
+								if ($.isArray(entry.value)) {
+									date = new Date(getValue(entry.value[0]), getValue(entry.value[1])-1, getValue(entry.value[2]));
+								} else {
+									date = new Date(value);
+								}
+								if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
+									// todo: add compatison for strings
+									console.log(date);
+									console.log(date.getFullYear() + ' ' + date.getMonth() + ' ' + date.getDate());
+									if (date.getFullYear() == getValue(entry.value[0]) &&
+										date.getMonth() == getValue(entry.value[1])-1 &&
+										date.getDate() == getValue(entry.value[2])) {
+										result = true;
+									} else {
+										result = false;
+									}
+								} else {
+									console.log('not a date');
+									result = false;
+								}
+								break;
 							case 'validator':
 								self.options('validationMessageHide')(validation_msg);
 								self.options('validationOkHide')(validation_ok);
@@ -390,7 +421,9 @@ https://github.com/fra-iesus/tdp
 						}
 						return false;
 					});
-					definition.validated = (results.length === 0);
+					if (!skip_validators) {
+						definition.validated = (results.length === 0);
+					}
 					var result = this.options('validationMessageProcessor')(results);
 					// for global search of error message element
 					// $(this.options('validationMessageElement') + '[name="' + name + '"]').html(result);
@@ -404,7 +437,7 @@ https://github.com/fra-iesus/tdp
 						this.options('validationMessageShow')(validation_msg);
 						this.options('validationOkHide')(validation_ok);
 					}
-					return definition.validated;
+					return (!result);
 				} else {
 					console.warn('Input "' + name + '" is not defined for validation');
 				}
@@ -442,7 +475,7 @@ https://github.com/fra-iesus/tdp
 			}
 		}
 		function init() {
-			var $el          = $(this);
+			var $el = $(this);
 			var tdpPlugin = new TdpPlugin($el, options, args);
 			$el.data('TdpPlugin', tdpPlugin);
 		}
