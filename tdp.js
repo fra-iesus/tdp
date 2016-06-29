@@ -176,7 +176,7 @@ https://github.com/fra-iesus/tdp
 						errElement = element;
 					}
 					setTimeout( function() {
-						self.options('validationMessageFlash')($(self.options('validationMessageElement' + '[name="' + key + '"]')).first());
+						self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
 					}, self.options('validationMessageFlashDelay')*i++);
 				}
 			});
