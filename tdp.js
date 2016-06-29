@@ -118,10 +118,18 @@ https://github.com/fra-iesus/tdp
 			return $(newelement).html(html);
 		}
 
-		//get value from input name
-		function getValue(name) {
+		//get input element
+		function getInput(name) {
 			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
+				return element;
+			}
+		}
+
+		//get value from input name
+		function getValue(name) {
+			var element = getInput(name);
+			if (element) {
 				return element.val();
 			}
 		}
@@ -194,10 +202,10 @@ https://github.com/fra-iesus/tdp
 				}
 				input_element.val(input.value);
 				input_element.on('input', function() {
-					self.validate(this, ['validator', 'min', 'not', 'match', 'date']);
+					self.validate(this, ['validator', 'min', 'not', 'match']);
 				});
 				input_element.on('change, blur', function() {
-					self.validate(this, ['date']);
+					self.validate(this);
 				});
 			});
 		});
@@ -212,14 +220,14 @@ https://github.com/fra-iesus/tdp
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (!input.validated || input.revalidate) {
-					var element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').first();
+					var element = getInput(key);
 					if (input.validated === null || input.revalidate) {
 						self.validate(element);
 					}
 					if (!errElement) {
 						errElement = element;
 					}
-					if (!input.validated) {
+					if (!input.validated && input.validated !== null) {
 						setTimeout( function() {
 							self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
 						}, self.options('validationMessageFlashDelay')*i++);
@@ -252,10 +260,9 @@ https://github.com/fra-iesus/tdp
 
 		// validate input
 		this.validate = function( input, skip_validators ) {
-			var $input = (input instanceof jQuery ? input : $(input));
-			var self = this;
+			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? getInput(input) : $(input)));
 			if ( $input.is('input,textarea,select') ) {
-				var tdp = this;
+				var self = this;
 				var name = $input.attr('name');
 				if ( name in this._parameters.values ) {
 					var value = $input.val();
@@ -264,7 +271,7 @@ https://github.com/fra-iesus/tdp
 					var definition = this._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
-							if (getValue(this._parameters.values[definition.match]) == value) {
+							if (getValue(definition.match) == value) {
 								return;
 							}
 						} else {
@@ -278,6 +285,10 @@ https://github.com/fra-iesus/tdp
 					}
 					var results = [];
 					var later = false;
+					var skipped = false;
+					if (skip_validators) {
+						skipped = true;
+					}
 					if (!definition.conditions || !definition.conditions.length) {
 						definition.validated = true;
 						return true;
@@ -319,8 +330,8 @@ https://github.com/fra-iesus/tdp
 							default:
 								console.warn('Input "' + name + '" has unknown input type "' + definition.type + '"');
 						}
-						if (tdp._log !== null) {
-							tdp._log.append("Evaluating condition '" + entry.type + "(" + t1 + ", " + t2 + ")'\n");
+						if (self._log !== null) {
+							self._log.append("Evaluating condition '" + entry.type + "(" + t1 + ", " + t2 + ")'\n");
 						}
 						switch (entry.type) {
 							case 'regular':
@@ -347,22 +358,42 @@ https://github.com/fra-iesus/tdp
 								break;
 							case 'date':
 								var date;
+								var skip = false;
 								if ($.isArray(entry.value)) {
-									date = new Date(getValue(entry.value[0]), getValue(entry.value[1])-1, getValue(entry.value[2]));
+									if (!getValue(entry.value[0]) || !getValue(entry.value[1]) || !getValue(entry.value[2])) {
+										skip = true;
+									} else {
+										date = new Date(getValue(entry.value[0]), getValue(entry.value[1])-1, getValue(entry.value[2]));
+									}
 								} else {
 									date = new Date(value);
 								}
-								if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
-									// todo: add compatison for strings
-									if (date.getFullYear() == getValue(entry.value[0]) &&
-										date.getMonth() == getValue(entry.value[1])-1 &&
-										date.getDate() == getValue(entry.value[2])) {
-										result = true;
+								if (!skip) {
+									if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
+										// todo: add compatison for strings
+										if (date.getFullYear() == getValue(entry.value[0]) &&
+											date.getMonth() == getValue(entry.value[1])-1 &&
+											date.getDate() == getValue(entry.value[2])) {
+											result = true;
+											if ($.isArray(entry.value)) {
+												var tmp_validated = definition.validated;
+												definition.validated = 1;
+												entry.value.some(function(date_part) {
+													if (name != date_part && !self._parameters.values[date_part].validated) {
+														self.validate(date_part, skip_validators);
+													}
+												});
+												definition.validated = tmp_validated;
+											}
+										} else {
+											result = false;
+										}
 									} else {
 										result = false;
 									}
 								} else {
-									result = false;
+									skipped = true;
+									result = true;
 								}
 								break;
 							case 'validator':
@@ -418,7 +449,7 @@ https://github.com/fra-iesus/tdp
 						}
 						return false;
 					});
-					if (!skip_validators) {
+					if (!skipped) {
 						definition.validated = (results.length === 0);
 					}
 					var result = this.options('validationMessageProcessor')(results);
@@ -426,7 +457,7 @@ https://github.com/fra-iesus/tdp
 					// $(this.options('validationMessageElement') + '[name="' + name + '"]').html(result);
 					if (!result) {
 						this.options('validationMessageHide')(validation_msg);
-						if (!skip_validators && !later && !(definition.match && !this._parameters.values[definition.match].validated)) {
+						if (!skipped && !later && !(definition.match && !this._parameters.values[definition.match].validated)) {
 							this.options('validationOkShow')(validation_ok);
 						}
 					} else {
