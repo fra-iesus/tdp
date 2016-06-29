@@ -318,6 +318,8 @@ https://github.com/fra-iesus/tdp
 								result = value == getValue(entry.value);
 								break;
 							case 'validator':
+								self.options('validationMessageHide')(validation_msg);
+								self.options('validationOkHide')(validation_ok);
 								self.options('validationWorkingShow')($(self.options('validationWorkingElement') + '[name="' + name + '"]').first());
 								later = true;
 								var request = $.ajax({
@@ -340,12 +342,10 @@ https://github.com/fra-iesus/tdp
 											result = message ? entry.message : false;
 										}
 										if (!result) {
-											self.options('validationMessageHide')(validation_msg);
 											self.options('validationOkShow')(validation_ok);
 										} else {
 											validation_msg.html(result);
 											self.options('validationMessageShow')(validation_msg);
-											self.options('validationOkHide')(validation_ok);
 										}
 									},
 									error: function(data) {
@@ -353,7 +353,6 @@ https://github.com/fra-iesus/tdp
 											result = self.options('validationMessageProcessor')([entry.message]);
 											validation_msg.html(result);
 											self.options('validationMessageShow')(validation_msg);
-											self.options('validationOkHide')(validation_ok);
 									},
 									async: true
 								}).always(function () {
