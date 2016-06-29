@@ -333,17 +333,17 @@ https://github.com/fra-iesus/tdp
 										var message = self.options('validatorResponseProcessor')(data);
 										var result = false;
 										if (typeof message === 'string') {
-											definition.validated = 0;
 											result = self.options('validationMessageProcessor')([message]);
 											// for global search of error message element
 											// $(self.options('validationMessageElement') + '[name="' + name + '"]').html(result);
 										} else {
-											definition.validated = !message;
 											result = message ? entry.message : false;
 										}
 										if (!result) {
+											definition.validated = 1;
 											self.options('validationOkShow')(validation_ok);
 										} else {
+											definition.validated = 0;
 											validation_msg.html(result);
 											self.options('validationMessageShow')(validation_msg);
 										}
