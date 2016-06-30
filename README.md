@@ -31,6 +31,7 @@ A few words about possibilities:
 - support nested validation messages / statuses elements (eg. "div.validation-msg div.nice-popup span.text")
 - almost everything is customizable
 - different validations are processed in different moments (there's no need to test minimal length of string input, while user is still typing, althrough it makes sense to test for maximal length and so on)
+- supports console (user defined html element) for logs
 
 Full documentation is a part of todo :-)
 See demo for basic usage and plugin code (especially default values) for all the ways you can customize the plugin
