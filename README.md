@@ -34,7 +34,97 @@ A few words about possibilities:
 - supports console (user defined html element) for logs
 
 Full documentation is a part of todo :-)
-See demo for basic usage and plugin code (especially default values) for all the ways you can customize the plugin
+See demo for usage and plugin code (especially default values) for all the ways you can customize the plugin
+
+Basic usage:
+
+<form id="form01" method="POST">
+  Name: <input name="name" type="text" /><br />
+  Phone number: <input name="phone" type="tel" /><br />
+  Date of birth: <select name="day"></select> <select name="month"></select> <select name="year"></select><br />
+  Password: <input name="password" type="password" /><br />
+  Confirm password: <input name="password_confirmation" type="password" /><br />
+  <div class="register-button"><button class="button1"><span>Save</span></button></div>
+</form>
+<br />
+<textarea class="console">MESSAGES:
+</textarea>
+<script>
+$('form#form01').tdp({
+	submitElement: 'div.register-button button',
+	validationMessageSeparator: ' + ',
+	validationMessageElement: 'span.tdp-vld-msg span.text span',
+  logger: 'textarea.console'
+}, {
+	values: {
+		name: {
+			value: '',
+			type: 'text',
+			conditions: [
+				{type: 'min', value: 1, message: 'Hey, what\'s your name?'},
+				{type: 'max', value: 1000, message: 'Your name seems to be toooooo loooong'}
+			]
+		},
+		phone: {
+			value: '+1',
+			type: 'text',
+			conditions: [
+				{type: 'regular', value: '^\\+', message: 'Please use phone number in international format (+XXX)', last: true},
+				{type: 'min', value: 9, message: 'Phone number is too short'},
+ 				{type: 'regular', value: '^\\+([0-9]\\ *){10,12}$', message: 'Invalid phone number format'}
+			]
+		},
+		day: {
+			value: '',
+			type: 'select',
+			values: [ [ '', 'Day' ] ],
+			interval: [	1, 31 ],
+			conditions: [
+				{type: 'not', value: '', message: 'Select day of birth', last: 1},
+				{type: 'date', value: ['year', 'month', 'day'], message: 'Entered date is not valid'},
+        {type: 'age', value:  ['year', 'month', 'day', 18], message: 'You must be at least 18 years old to do anything here'}
+			]
+		},
+		month: {
+			value: '',
+			type: 'select',
+			values: [ [ '', 'Month' ] ],
+			interval: [	1, 12 ],
+			conditions: [
+				{type: 'not', value: '', message: 'Select month of birth', last: 1},
+				{type: 'date', value: ['year', 'month', 'day'], message: 'Entered date is not valid'},
+        {type: 'age', value:  ['year', 'month', 'day', 18], message: 'You must be at least 18 years old to do anything here'}
+			]
+		},
+		year: {
+			value: '',
+			type: 'select',
+			values: [ [ '', 'Year' ] ],
+			interval: [	1916, 2000 ],
+			conditions: [
+				{type: 'not', value: '', message: 'Select year of birth', last: 1},
+				{type: 'date', value: ['year', 'month', 'day'], message: 'Entered date is not valid'},
+        {type: 'age', value:  ['year', 'month', 'day', 18], message: 'You must be at least 18 years old to do anything here'}
+			]
+		},
+		password: {
+			value: '',
+			type: 'password',
+			conditions: [
+				{type: 'min', value: 6, message: 'Password is too easy to guess'},
+				{type: 'max', value: 100, message: 'huh, too long to remember, isn\'t it?'}
+			]
+		},
+		password_confirmation: {
+			value: '',
+			type: 'password',
+			conditions: [
+				{type: 'match', value: 'password', message: 'Both passwords should match'}
+			]
+		}
+	}	
+});
+</script>
 
 
 HISTORY/CHANGELOG:
