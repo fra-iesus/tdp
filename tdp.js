@@ -520,8 +520,8 @@ https://github.com/fra-iesus/tdp
 					if (input.validated === null || input.revalidate) {
 						self.validate(element);
 					}
-					topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
 					if (!input.validated && input.validated !== null) {
+						topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
 						setTimeout( function() {
 							self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 						}, self.options('validationMessageFlashDelay')*i++);
