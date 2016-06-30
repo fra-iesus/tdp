@@ -124,14 +124,19 @@ https://github.com/fra-iesus/tdp
 			if (element.length) {
 				return element;
 			}
+			return null;
 		}
 
 		//get value from input name
 		function getValue(name) {
-			var element = getInput(name);
+			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
 			if (element) {
+				if (element.is('radio')) {
+					return element.filter(':checked').val();
+				}
 				return element.val();
 			}
+			return null;
 		}
 
 		// validator
@@ -189,6 +194,13 @@ https://github.com/fra-iesus/tdp
 							}
 						}
 					}
+					input_element.val(input.value);
+				} else if (input.type === 'radio') {
+					if (input.value) {
+						input_element.filter('[value=' + input.value + ']').prop( "checked", true );
+					}
+				} else {
+					input_element.val(input.value);
 				}
 				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
 					input_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
@@ -200,7 +212,6 @@ https://github.com/fra-iesus/tdp
 				if (!$(self.options('validationWorkingElement') + '[name="' + key + '"]').length) {
 					input_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 				}
-				input_element.val(input.value);
 				input_element.on('input', function() {
 					self.validate(this, ['validator', 'min', 'not', 'match']);
 				});
@@ -265,7 +276,7 @@ https://github.com/fra-iesus/tdp
 				var self = this;
 				var name = $input.attr('name');
 				if ( name in this._parameters.values ) {
-					var value = $input.val();
+					var value = getValue($input);
 					var validation_msg = $(self.options('validationMessageElement') + '[name="' + name + '"]').first();
 					var validation_ok = $(self.options('validationOkElement') + '[name="' + name + '"]').first();
 					var definition = this._parameters.values[name];
