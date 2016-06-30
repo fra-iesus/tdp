@@ -5,10 +5,14 @@ Tiny Dialogue Plugin - jQuery Plugin for Forms processing and validation
 
 HISTORY/CHANGELOG:
 
-- fixed critical issue preventing form submit
 
 1.1
 - "good enough" release :-)
+- fixed critical issue preventing form submit
+- a lot of fixes and improvements
+
+1.0
+- initial release
 
 TODO:
 - full documentation (examples)
