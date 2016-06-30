@@ -37,7 +37,7 @@ Full documentation is a part of todo :-)
 See demo for usage and plugin code (especially default values) for all the ways you can customize the plugin
 
 Basic usage:
-
+```html
 <form id="form01" method="POST">
   Name: <input name="name" type="text" /><br />
   Phone number: <input name="phone" type="tel" /><br />
@@ -125,7 +125,7 @@ $('form#form01').tdp({
 	}	
 });
 </script>
-
+```
 
 HISTORY/CHANGELOG:
 
