@@ -147,3 +147,4 @@ $('form#form01').tdp({
 - edit/view switch
 - full form html generator
 - different validation message elements for some messages
+- methods for adding/removal of validation conditions for inputs (to be able to modify it dynamically after init)
