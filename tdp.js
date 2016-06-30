@@ -14,6 +14,7 @@ https://github.com/fra-iesus/tdp
 			dialogCloseDuration: 500,
 			dialogAutoclose: false,
 			validationOkElement: 'span.tdp-vld-ok',
+			validationOkText: '✓',
 			prevalidation: true,
 			validationOkShow: function(el) {
 				return el.fadeIn('slow');
@@ -475,7 +476,7 @@ https://github.com/fra-iesus/tdp
 				}
 				if (!$(getByOuterElement(self.options('validationMessageElement'), key)).length && !$(getByOuterElement(self.options('validationOkElement'), key)).length) {
 					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
-						after(createElement(self.options('validationOkElement'), '✓').attr('name', key).hide());
+						after(createElement(self.options('validationOkElement'), self.options('validationOkText')).attr('name', key).hide());
 				} else {
 					self.options('validationMessageHide')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 					self.options('validationOkHide')($(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
