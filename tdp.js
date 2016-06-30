@@ -53,6 +53,7 @@ https://github.com/fra-iesus/tdp
 				return false;
 			},
 			submitMethod: null, // directly submit form
+			submitElement: 'input[type="submit"]',
 			verbose: false,
 			logger: null
 		};
@@ -123,7 +124,7 @@ https://github.com/fra-iesus/tdp
 		function getValue(name) {
 			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
 			if (element) {
-				if (element.is('radio')) {
+				if (element.is(':radio')) {
 					return element.filter(':checked').val();
 				}
 				return element.val();
@@ -216,16 +217,16 @@ https://github.com/fra-iesus/tdp
 								result = (t1 !== t2);
 								break;
 							case 'notNaN':
-								result = !Number.isNaN(t1);
+								result = !Number.isNaN(t1) && (t1 !== undefined);
 								break;
 							case 'valid':
 								result = t1 == value;
 								break;
 							case 'min':
-								result = !Number.isNaN(t1) && t1 >= t2;
+								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 >= t2;
 								break;
 							case 'max':
-								result = !Number.isNaN(t1) && t1 <= t2;
+								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 <= t2;
 								break;
 							case 'match':
 								result = value == getValue(entry.value);
@@ -347,7 +348,6 @@ https://github.com/fra-iesus/tdp
 
 		//html element creator
 		function createElement(el, html) {
-
 			function createSubElement(el, html) {
 				var start_class = el.indexOf('.');
 				var start_id = el.indexOf('#');
@@ -502,8 +502,9 @@ https://github.com/fra-iesus/tdp
 			});
 		});
 
-		$el.submit(function(ev){
-			var errElement = null;
+		// submit form
+		this.submitForm = function(ev) {
+			var topElement = null;
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
@@ -512,9 +513,7 @@ https://github.com/fra-iesus/tdp
 					if (input.validated === null || input.revalidate) {
 						self.validate(element);
 					}
-					if (!errElement) {
-						errElement = element;
-					}
+					topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
 					if (!input.validated && input.validated !== null) {
 						setTimeout( function() {
 							self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
@@ -522,18 +521,41 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
-			if (errElement) {
+			if (topElement) {
 				$('html, body').animate({
-					scrollTop: errElement.offset().top
+					scrollTop: topElement
 				}, self.options('scrollToErrorDuration'));
+				if (ev !== null && typeof ev === 'object') {
+					ev.preventDefault();
+				}
 				return false;
 			}
 			if (self.options('submitMethod') !== null) {
-				ev.preventDefault();
+				if (ev !== null && typeof ev === 'object') {
+					ev.preventDefault();
+				}
 				return self.options('submitMethod')();
 			}
 			return true;
+		};
+
+		if ($el.is('form')) {
+			$el.submit(function(ev){
+				if (!self.submitForm()) {
+					ev.preventDefault();
+					return false;
+				}
+				return true;
+			});
+		}
+		$el.find(this.options('submitElement')).on('click', function(ev){
+			ev.preventDefault();
+			if (!self.submitForm()) {
+				return false;
+			}
+			return true;
 		});
+
 	};
 
 	$.fn.tdp = function(methodOrOptions) {
