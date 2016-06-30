@@ -3,7 +3,13 @@ current version: 1.1
 
 Tiny Dialogue Plugin - jQuery Plugin for Forms processing and validation
 
-history:
-
+HISTORY:
 1.1
 - "good enough" release :-)
+
+TODO:
+- full documentation (examples)
+- custom validation functions
+- converters (convert data from one/multiple input(s) to another)
+- edit/view switch
+- full form html generator
