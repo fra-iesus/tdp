@@ -233,6 +233,7 @@ https://github.com/fra-iesus/tdp
 								result = value == getValue(entry.value);
 								break;
 							case 'date':
+							case 'age':
 								var date;
 								var skip = false;
 								if ($.isArray(entry.value)) {
@@ -247,22 +248,27 @@ https://github.com/fra-iesus/tdp
 								if (!skip) {
 									if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
 										// todo: add compatison for strings
-										if (date.getFullYear() == getValue(entry.value[0]) &&
-											date.getMonth() == getValue(entry.value[1])-1 &&
-											date.getDate() == getValue(entry.value[2])) {
-											result = true;
-											if ($.isArray(entry.value)) {
-												var tmp_validated = definition.validated;
-												definition.validated = 1;
-												entry.value.some(function(date_part) {
-													if (name != date_part && !self._parameters.values[date_part].validated) {
-														self.validate(date_part, skip_validators);
-													}
-												});
-												definition.validated = tmp_validated;
-											}
+										if (entry.type === 'age') {
+											var age = +date;
+											result = ~~((Date.now() - age - 86400000) / (31557600000)) >= entry.value[3];
 										} else {
-											result = false;
+											if (date.getFullYear() == getValue(entry.value[0]) &&
+												date.getMonth() == getValue(entry.value[1])-1 &&
+												date.getDate() == getValue(entry.value[2])) {
+												result = true;
+												if ($.isArray(entry.value)) {
+													var tmp_validated = definition.validated;
+													definition.validated = 1;
+													entry.value.some(function(date_part) {
+														if (name != date_part && !self._parameters.values[date_part].validated) {
+															self.validate(date_part, skip_validators);
+														}
+													});
+													definition.validated = tmp_validated;
+												}
+											} else {
+												result = false;
+											}
 										}
 									} else {
 										result = false;
