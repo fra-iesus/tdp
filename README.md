@@ -130,11 +130,13 @@ $('form#form01').tdp({
 ## HISTORY/CHANGELOG:
 
 ### 1.1
+2016-06-30
 - "good enough" release :-)
 - fixed critical issue preventing form submit
 - a lot of fixes and improvements
 
 ### 1.0
+2016-06-29
 - initial release
 
 ## TODO:
