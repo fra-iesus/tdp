@@ -6,7 +6,7 @@ Tiny Dialogue Plugin - jQuery Plugin for Forms processing and validation
 VERY BASIC DESCRIPTION:
 
 Available input types:
-- tel / email / password / text - processed the same way
+- tel / email / password / text (as input or textarea) - processed the same way
 - date (only partial support, more is provided for date parts)
 - integer / float
 - chackbox / radio
