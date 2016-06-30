@@ -548,16 +548,14 @@ https://github.com/fra-iesus/tdp
 
 		if ($el.is('form')) {
 			$el.submit(function(ev){
-				if (!self.submitForm()) {
-					ev.preventDefault();
+				if (!self.submitForm(ev)) {
 					return false;
 				}
 				return true;
 			});
 		}
 		$el.find(this.options('submitElement')).on('click', function(ev){
-			ev.preventDefault();
-			if (!self.submitForm()) {
+			if (!self.submitForm(ev)) {
 				return false;
 			}
 			return true;
