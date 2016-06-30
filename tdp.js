@@ -14,6 +14,7 @@ https://github.com/fra-iesus/tdp
 			dialogCloseDuration: 500,
 			dialogAutoclose: false,
 			validationOkElement: 'span.tdp-vld-ok',
+			prevalidation: true,
 			validationOkShow: function(el) {
 				return el.fadeIn('slow');
 			},
@@ -55,6 +56,10 @@ https://github.com/fra-iesus/tdp
 			verbose: false,
 			logger: null
 		};
+
+		this._options = $.extend( true, {}, this._defaults, options );
+		this._parameters = parameters;
+
 		// options - getter/setter
 		this.options = function(options) {
 			if (options) {
@@ -77,186 +82,12 @@ https://github.com/fra-iesus/tdp
 		if (!options || typeof(options) !== 'object') {
 			options = {};
 		}
-		this._options = $.extend( true, {}, this._defaults, options );
-		this._parameters = parameters;
 
-		//html element creator
-		function createElement(el, html) {
-			var start_class = el.indexOf('.');
-			var start_id = el.indexOf('#');
-			var prop = '';
-			if (start_class > 0 || start_id > 0) {
-				var start_prop;
-				if (start_class > 0 && start_id > 0) {
-					start_prop = Math.min(start_class, start_id);
-				} else if (start_class > 0) {
-					start_prop = start_class;
-				} else {
-					start_prop = start_id;
-				}
-				prop = el.substring(start_prop);
-				el = el.substring(0, start_prop);
-			}
-			var props = prop.split('.'),
-			newelement = $('<' + el + '></' + el + '>'),
-			id = '',
-			className = '';
-			$.each(props, function(i, val) {
-				if(val.indexOf('#') >= 0) {
-					id += val.replace(/^#/, '');
-				} else {
-					className += val + ' ';
-				}
-			});
-			if (id.length) {
-				newelement.attr('id', id);
-			}
-			if(className.length) {
-				newelement.attr('class', className.trim());
-			}
-
-			return $(newelement).html(html);
-		}
-
-		//get input element
-		function getInput(name) {
-			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
-			if (element.length) {
-				return element;
-			}
-			return null;
-		}
-
-		//get value from input name
-		function getValue(name) {
-			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
-			if (element) {
-				if (element.is('radio')) {
-					return element.filter(':checked').val();
-				}
-				return element.val();
-			}
-			return null;
-		}
-
-		// validator
-		Object.keys(this._parameters.values).forEach(function(key) {
-			var input = self._parameters.values[key];
-			input.validated = null;
-			input.old_value = null;
-			var match = false;
-			var revalidate = false;
-			if (input.conditions && input.conditions.length) {
-				input.conditions.some(function(entry) {
-					if (entry.type === 'match') {
-						match = entry.value;
-						revalidate = true;
-						return;
-					} else if (entry.type === 'date') {
-						revalidate = true;
-						return;
-					}
-				});
-			}
-			input.match = match;
-			input.revalidate = revalidate;
-			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
-				input_element = $(this);
-				if (input.type === 'select') {
-					if (input.interval || input.values) {
-						// for select set allowed values if defined
-						input_element.find("option").remove();
-						if (input.values) {
-							input.values.some(function(entry) {
-								var setting = [];
-								if( typeof entry === 'string' ) {
-									setting = [entry, entry, false];
-								} else {
-									setting = [ entry[0], (entry.length > 1 ? entry[1] : entry[0]), (entry.length > 2 ? !entry[2] : false)];
-								}
-								var option = createElement('option', entry[1]).attr("value",entry[0]);
-								if (entry[2]) {
-									option.attr("disabled");
-								}
-								input_element.append(option);
-							});
-						}
-						if (input.interval) {
-							var min = input.interval[0];
-							var max = input.interval[1];
-							var inc = (min < max) ? 1 : -1;
-							if (input.interval.length > 2) {
-								inc *= input.interval[2];
-							}
-							var index;
-							for (index = min; index * inc <= max * inc; index += inc ) {
-								input_element.append(createElement('option', index).attr("value",index));
-							}
-						}
-					}
-					input_element.val(input.value);
-				} else if (input.type === 'radio') {
-					if (input.value) {
-						input_element.filter('[value=' + input.value + ']').prop( "checked", true );
-					}
-				} else {
-					input_element.val(input.value);
-				}
-				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
-					input_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
-						after(createElement(self.options('validationOkElement'), '✓').attr('name', key).hide());
-				} else {
-					self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
-					self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
-				}
-				if (!$(self.options('validationWorkingElement') + '[name="' + key + '"]').length) {
-					input_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
-				}
-				input_element.on('input', function() {
-					self.validate(this, ['validator', 'min', 'not', 'match']);
-				});
-				input_element.on('change, blur', function() {
-					self.validate(this);
-				});
-			});
-		});
 		if (this.options('logger') && $(this.options('logger')).length) {
 			this._log = $(this.options('logger'));
 		} else {
 			this._log = null;
 		}
-		$el.submit(function(ev){
-			var errElement = null;
-			var i = 0;
-			Object.keys(self._parameters.values).forEach(function(key) {
-				var input = self._parameters.values[key];
-				if (!input.validated || input.revalidate) {
-					var element = getInput(key);
-					if (input.validated === null || input.revalidate) {
-						self.validate(element);
-					}
-					if (!errElement) {
-						errElement = element;
-					}
-					if (!input.validated && input.validated !== null) {
-						setTimeout( function() {
-							self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
-						}, self.options('validationMessageFlashDelay')*i++);
-					}
-				}
-			});
-			if (errElement) {
-				$('html, body').animate({
-					scrollTop: errElement.offset().top
-				}, self.options('scrollToErrorDuration'));
-				return false;
-			}
-			if (self.options('submitMethod') !== null) {
-				ev.preventDefault();
-				return self.options('submitMethod')();
-			}
-			return true;
-		});
 
 		// show dialogue
 		this.show = function() {
@@ -484,6 +315,204 @@ https://github.com/fra-iesus/tdp
 				console.warn('Element "' + input + '" is not valid input');
 			}
 		};
+
+		//html element creator
+		function createElement(el, html) {
+			var start_class = el.indexOf('.');
+			var start_id = el.indexOf('#');
+			var prop = '';
+			if (start_class > 0 || start_id > 0) {
+				var start_prop;
+				if (start_class > 0 && start_id > 0) {
+					start_prop = Math.min(start_class, start_id);
+				} else if (start_class > 0) {
+					start_prop = start_class;
+				} else {
+					start_prop = start_id;
+				}
+				prop = el.substring(start_prop);
+				el = el.substring(0, start_prop);
+			}
+			var props = prop.split('.'),
+			newelement = $('<' + el + '></' + el + '>'),
+			id = '',
+			className = '';
+			$.each(props, function(i, val) {
+				if(val.indexOf('#') >= 0) {
+					id += val.replace(/^#/, '');
+				} else {
+					className += val + ' ';
+				}
+			});
+			if (id.length) {
+				newelement.attr('id', id);
+			}
+			if(className.length) {
+				newelement.attr('class', className.trim());
+			}
+
+			return $(newelement).html(html);
+		}
+
+		//get input element
+		function getInput(name) {
+			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+			if (element.length) {
+				return element;
+			}
+			return null;
+		}
+
+		//get value from input name
+		function getValue(name) {
+			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
+			if (element) {
+				if (element.is('radio')) {
+					return element.filter(':checked').val();
+				}
+				return element.val();
+			}
+			return null;
+		}
+
+		// validator
+		Object.keys(this._parameters.values).forEach(function(key) {
+			var input = self._parameters.values[key];
+			input.validated = null;
+			input.old_value = null;
+			var match = false;
+			var revalidate = false;
+			if (input.conditions && input.conditions.length) {
+				input.conditions.some(function(entry) {
+					if (entry.type === 'match') {
+						match = entry.value;
+						revalidate = true;
+						return;
+					} else if (entry.type === 'date') {
+						revalidate = true;
+						return;
+					}
+				});
+			}
+			input.match = match;
+			input.revalidate = revalidate;
+			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
+				input_element = $(this);
+				if (input.type === 'select') {
+					if (input.interval || input.values) {
+						// for select set allowed values if defined
+						input_element.find("option").remove();
+						if (input.values) {
+							input.values.some(function(entry) {
+								var setting = [];
+								if( typeof entry === 'string' ) {
+									setting = [entry, entry, false];
+								} else {
+									setting = [ entry[0], (entry.length > 1 ? entry[1] : entry[0]), (entry.length > 2 ? !entry[2] : false)];
+								}
+								var option = createElement('option', entry[1]).attr("value",entry[0]);
+								if (entry[2]) {
+									option.attr("disabled");
+								}
+								input_element.append(option);
+							});
+						}
+						if (input.interval) {
+							var min = input.interval[0];
+							var max = input.interval[1];
+							var inc = (min < max) ? 1 : -1;
+							if (input.interval.length > 2) {
+								inc *= input.interval[2];
+							}
+							var index;
+							for (index = min; index * inc <= max * inc; index += inc ) {
+								input_element.append(createElement('option', index).attr("value",index));
+							}
+						}
+					}
+				}
+				if (input.type === 'radio') {
+					if (input.value) {
+						input_element.filter('[value=' + input.value + ']').prop( "checked", true );
+					}
+					input_element.on('click', function() {
+						self.validate(this);
+					});
+				} else {
+					if (input.value) {
+						input_element.val(input.value);
+					}
+					input_element.on('input', function() {
+						self.validate(this, ['validator', 'min', 'not', 'match']);
+					});
+					input_element.on('change, blur', function() {
+						self.validate(this);
+					});
+				}
+				var val_element = input_element;
+				if (input.type === 'radio') {
+					val_element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').last();
+					if (val_element.next('label[for="' + val_element.attr('id') + '"]').length) {
+						val_element = val_element.next('label[for="' + val_element.attr('id') + '"]');
+					}
+				}
+				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
+					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
+						after(createElement(self.options('validationOkElement'), '✓').attr('name', key).hide());
+				} else {
+					self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
+					self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
+				}
+				var has_validator = false;
+				if (input.conditions && input.conditions.length) {
+					input.conditions.some(function(entry) {
+						if (entry.type === 'validator') {
+							has_validator = true;
+							return;
+						}
+					});
+				}
+				if (has_validator && !$(self.options('validationWorkingElement') + '[name="' + key + '"]').length) {
+					val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
+				}
+				if (input.value && self.options('prevalidation')) {
+					self.validate(this);
+				}
+			});
+		});
+
+		$el.submit(function(ev){
+			var errElement = null;
+			var i = 0;
+			Object.keys(self._parameters.values).forEach(function(key) {
+				var input = self._parameters.values[key];
+				if (!input.validated || input.revalidate) {
+					var element = getInput(key);
+					if (input.validated === null || input.revalidate) {
+						self.validate(element);
+					}
+					if (!errElement) {
+						errElement = element;
+					}
+					if (!input.validated && input.validated !== null) {
+						setTimeout( function() {
+							self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
+						}, self.options('validationMessageFlashDelay')*i++);
+					}
+				}
+			});
+			if (errElement) {
+				$('html, body').animate({
+					scrollTop: errElement.offset().top
+				}, self.options('scrollToErrorDuration'));
+				return false;
+			}
+			if (self.options('submitMethod') !== null) {
+				ev.preventDefault();
+				return self.options('submitMethod')();
+			}
+			return true;
+		});
 	};
 
 	$.fn.tdp = function(methodOrOptions) {
