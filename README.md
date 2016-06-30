@@ -13,3 +13,4 @@ TODO:
 - converters (convert data from one/multiple input(s) to another)
 - edit/view switch
 - full form html generator
+- different validation message elements for some messages
