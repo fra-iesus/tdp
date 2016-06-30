@@ -100,6 +100,37 @@ https://github.com/fra-iesus/tdp
 			return $el;
 		};
 
+		function outerElement(el) {
+			return el.split(' ')[0];
+		}
+
+		function getByOuterElement(el, name) {
+			var els = el.split(' ');
+			els[0] += '[name="' + name + '"]';
+			return els.join(' ');
+		}
+
+		//get input element
+		function getInput(name) {
+			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+			if (element.length) {
+				return element;
+			}
+			return null;
+		}
+
+		//get value from input name
+		function getValue(name) {
+			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
+			if (element) {
+				if (element.is('radio')) {
+					return element.filter(':checked').val();
+				}
+				return element.val();
+			}
+			return null;
+		}
+
 		// validate input
 		this.validate = function( input, skip_validators ) {
 			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? getInput(input) : $(input)));
@@ -108,8 +139,9 @@ https://github.com/fra-iesus/tdp
 				var name = $input.attr('name');
 				if ( name in this._parameters.values ) {
 					var value = getValue($input);
-					var validation_msg = $(self.options('validationMessageElement') + '[name="' + name + '"]').first();
-					var validation_ok = $(self.options('validationOkElement') + '[name="' + name + '"]').first();
+					var validation_msg = $(getByOuterElement(self.options('validationMessageElement'), name)).first();
+					var validation_msg_el = $(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
+					var validation_ok = $(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
 					var definition = this._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
@@ -239,9 +271,10 @@ https://github.com/fra-iesus/tdp
 								}
 								break;
 							case 'validator':
-								self.options('validationMessageHide')(validation_msg);
+								self.options('validationMessageHide')(validation_msg_el);
 								self.options('validationOkHide')(validation_ok);
-								self.options('validationWorkingShow')($(self.options('validationWorkingElement') + '[name="' + name + '"]').first());
+								var working_el = $(getByOuterElement(self.options('validationWorkingElement'), name)).first();
+								self.options('validationWorkingShow')(working_el);
 								later = true;
 								var request = $.ajax({
 									url: entry.value,
@@ -255,8 +288,6 @@ https://github.com/fra-iesus/tdp
 										var result = false;
 										if (typeof message === 'string') {
 											result = self.options('validationMessageProcessor')([message]);
-											// for global search of error message element
-											// $(self.options('validationMessageElement') + '[name="' + name + '"]').html(result);
 										} else {
 											result = message ? entry.message : false;
 										}
@@ -266,18 +297,18 @@ https://github.com/fra-iesus/tdp
 										} else {
 											definition.validated = 0;
 											validation_msg.html(result);
-											self.options('validationMessageShow')(validation_msg);
+											self.options('validationMessageShow')(validation_msg_el);
 										}
 									},
 									error: function(data) {
 											definition.validated = 0;
 											result = self.options('validationMessageProcessor')([entry.message]);
 											validation_msg.html(result);
-											self.options('validationMessageShow')(validation_msg);
+											self.options('validationMessageShow')(validation_msg_el);
 									},
 									async: true
 								}).always(function () {
-									self.options('validationWorkingHide')($(self.options('validationWorkingElement') + '[name="' + name + '"]').first());
+									self.options('validationWorkingHide')(working_el);
 								});
 								break;
 							default:
@@ -295,16 +326,14 @@ https://github.com/fra-iesus/tdp
 						definition.validated = (results.length === 0);
 					}
 					var result = this.options('validationMessageProcessor')(results);
-					// for global search of error message element
-					// $(this.options('validationMessageElement') + '[name="' + name + '"]').html(result);
 					if (!result) {
-						this.options('validationMessageHide')(validation_msg);
+						this.options('validationMessageHide')(validation_msg_el);
 						if (!skipped && !later && !(definition.match && !this._parameters.values[definition.match].validated)) {
 							this.options('validationOkShow')(validation_ok);
 						}
 					} else {
 						validation_msg.html(result);
-						this.options('validationMessageShow')(validation_msg);
+						this.options('validationMessageShow')(validation_msg_el);
 						this.options('validationOkHide')(validation_ok);
 					}
 					return (!result);
@@ -318,61 +347,49 @@ https://github.com/fra-iesus/tdp
 
 		//html element creator
 		function createElement(el, html) {
-			var start_class = el.indexOf('.');
-			var start_id = el.indexOf('#');
-			var prop = '';
-			if (start_class > 0 || start_id > 0) {
-				var start_prop;
-				if (start_class > 0 && start_id > 0) {
-					start_prop = Math.min(start_class, start_id);
-				} else if (start_class > 0) {
-					start_prop = start_class;
-				} else {
-					start_prop = start_id;
+
+			function createSubElement(el, html) {
+				var start_class = el.indexOf('.');
+				var start_id = el.indexOf('#');
+				var prop = '';
+				if (start_class > 0 || start_id > 0) {
+					var start_prop;
+					if (start_class > 0 && start_id > 0) {
+						start_prop = Math.min(start_class, start_id);
+					} else if (start_class > 0) {
+						start_prop = start_class;
+					} else {
+						start_prop = start_id;
+					}
+					prop = el.substring(start_prop);
+					el = el.substring(0, start_prop);
 				}
-				prop = el.substring(start_prop);
-				el = el.substring(0, start_prop);
+				var props = prop.split('.'),
+				newelement = $('<' + el + '></' + el + '>'),
+				id = '',
+				className = '';
+				$.each(props, function(i, val) {
+					if(val.indexOf('#') >= 0) {
+						id += val.replace(/^#/, '');
+					} else {
+						className += val + ' ';
+					}
+				});
+				if (id.length) {
+					newelement.attr('id', id);
+				}
+				if(className.length) {
+					newelement.attr('class', className.trim());
+				}
+				return $(newelement).html(html);
 			}
-			var props = prop.split('.'),
-			newelement = $('<' + el + '></' + el + '>'),
-			id = '',
-			className = '';
-			$.each(props, function(i, val) {
-				if(val.indexOf('#') >= 0) {
-					id += val.replace(/^#/, '');
-				} else {
-					className += val + ' ';
-				}
+			var els = el.split(' ');
+			els = els.reverse();
+			var inner = html;
+			$.each(els, function(i, val) {
+				inner = createSubElement(val, inner).prop('outerHTML');
 			});
-			if (id.length) {
-				newelement.attr('id', id);
-			}
-			if(className.length) {
-				newelement.attr('class', className.trim());
-			}
-
-			return $(newelement).html(html);
-		}
-
-		//get input element
-		function getInput(name) {
-			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
-			if (element.length) {
-				return element;
-			}
-			return null;
-		}
-
-		//get value from input name
-		function getValue(name) {
-			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
-			if (element) {
-				if (element.is('radio')) {
-					return element.filter(':checked').val();
-				}
-				return element.val();
-			}
-			return null;
+			return $(inner);
 		}
 
 		// validator
@@ -456,12 +473,12 @@ https://github.com/fra-iesus/tdp
 						val_element = val_element.next('label[for="' + val_element.attr('id') + '"]');
 					}
 				}
-				if (!$(self.options('validationMessageElement') + '[name="' + key + '"]').length && !$(self.options('validationOkElement') + '[name="' + key + '"]').length) {
+				if (!$(getByOuterElement(self.options('validationMessageElement'), key)).length && !$(getByOuterElement(self.options('validationOkElement'), key)).length) {
 					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
 						after(createElement(self.options('validationOkElement'), '✓').attr('name', key).hide());
 				} else {
-					self.options('validationMessageHide')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
-					self.options('validationOkHide')($(self.options('validationOkElement') + '[name="' + key + '"]').first());
+					self.options('validationMessageHide')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+					self.options('validationOkHide')($(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
 				}
 				var has_validator = false;
 				if (input.conditions && input.conditions.length) {
@@ -472,8 +489,12 @@ https://github.com/fra-iesus/tdp
 						}
 					});
 				}
-				if (has_validator && !$(self.options('validationWorkingElement') + '[name="' + key + '"]').length) {
-					val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
+				if (has_validator) {
+					if (!$(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
+						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
+					} else {
+						self.options('validationWorkingHide')($(outerElement(self.options('validationWorkingElement')) + '[name="' + key + '"]').first());
+					}
 				}
 				if (input.value && self.options('prevalidation')) {
 					self.validate(this);
@@ -496,7 +517,7 @@ https://github.com/fra-iesus/tdp
 					}
 					if (!input.validated && input.validated !== null) {
 						setTimeout( function() {
-							self.options('validationMessageFlash')($(self.options('validationMessageElement') + '[name="' + key + '"]').first());
+							self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 						}, self.options('validationMessageFlashDelay')*i++);
 					}
 				}
