@@ -231,17 +231,17 @@ https://github.com/fra-iesus/tdp
 								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 <= t2;
 								break;
 							case 'match':
-								result = value == this.getValue(entry.value);
+								result = value == self.getValue(entry.value);
 								break;
 							case 'date':
 							case 'age':
 								var date;
 								var skip = false;
 								if ($.isArray(entry.value)) {
-									if (!this.getValue(entry.value[0]) || !this.getValue(entry.value[1]) || !this.getValue(entry.value[2])) {
+									if (!self.getValue(entry.value[0]) || !self.getValue(entry.value[1]) || !self.getValue(entry.value[2])) {
 										skip = true;
 									} else {
-										date = new Date(this.getValue(entry.value[0]), this.getValue(entry.value[1])-1, this.getValue(entry.value[2]));
+										date = new Date(self.getValue(entry.value[0]), self.getValue(entry.value[1])-1, this.getValue(entry.value[2]));
 									}
 								} else {
 									date = new Date(value);
@@ -253,9 +253,9 @@ https://github.com/fra-iesus/tdp
 											var age = +date;
 											result = ~~((Date.now() - age - 86400000) / (31557600000)) >= entry.value[3];
 										} else {
-											if (date.getFullYear() == this.getValue(entry.value[0]) &&
-												date.getMonth() == this.getValue(entry.value[1])-1 &&
-												date.getDate() == this.getValue(entry.value[2])) {
+											if (date.getFullYear() == self.getValue(entry.value[0]) &&
+												date.getMonth() == self.getValue(entry.value[1])-1 &&
+												date.getDate() == self.getValue(entry.value[2])) {
 												result = true;
 												if ($.isArray(entry.value)) {
 													var tmp_validated = definition.validated;
