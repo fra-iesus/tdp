@@ -61,6 +61,7 @@ https://github.com/fra-iesus/tdp
 
 		this._options = $.extend( true, {}, this._defaults, options );
 		this._parameters = parameters;
+		this._parameters.element = $el;
 
 		// options - getter/setter
 		this.options = function(options) {
@@ -122,7 +123,7 @@ https://github.com/fra-iesus/tdp
 		}
 
 		//get value from input name
-		function getValue(name) {
+		this.getValue = function (name) {
 			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
 			if (element) {
 				if (element.is(':radio')) {
@@ -131,7 +132,7 @@ https://github.com/fra-iesus/tdp
 				return element.val();
 			}
 			return null;
-		}
+		};
 
 		// validate input
 		this.validate = function( input, skip_validators ) {
@@ -140,14 +141,14 @@ https://github.com/fra-iesus/tdp
 				var self = this;
 				var name = $input.attr('name');
 				if ( name in this._parameters.values ) {
-					var value = getValue($input);
+					var value = this.getValue($input);
 					var validation_msg = $(getByOuterElement(self.options('validationMessageElement'), name)).first();
 					var validation_msg_el = $(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
 					var validation_ok = $(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
 					var definition = this._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
-							if (getValue(definition.match) == value) {
+							if (this.getValue(definition.match) == value) {
 								return;
 							}
 						} else {
@@ -230,17 +231,17 @@ https://github.com/fra-iesus/tdp
 								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 <= t2;
 								break;
 							case 'match':
-								result = value == getValue(entry.value);
+								result = value == this.getValue(entry.value);
 								break;
 							case 'date':
 							case 'age':
 								var date;
 								var skip = false;
 								if ($.isArray(entry.value)) {
-									if (!getValue(entry.value[0]) || !getValue(entry.value[1]) || !getValue(entry.value[2])) {
+									if (!this.getValue(entry.value[0]) || !this.getValue(entry.value[1]) || !this.getValue(entry.value[2])) {
 										skip = true;
 									} else {
-										date = new Date(getValue(entry.value[0]), getValue(entry.value[1])-1, getValue(entry.value[2]));
+										date = new Date(this.getValue(entry.value[0]), this.getValue(entry.value[1])-1, this.getValue(entry.value[2]));
 									}
 								} else {
 									date = new Date(value);
@@ -252,9 +253,9 @@ https://github.com/fra-iesus/tdp
 											var age = +date;
 											result = ~~((Date.now() - age - 86400000) / (31557600000)) >= entry.value[3];
 										} else {
-											if (date.getFullYear() == getValue(entry.value[0]) &&
-												date.getMonth() == getValue(entry.value[1])-1 &&
-												date.getDate() == getValue(entry.value[2])) {
+											if (date.getFullYear() == this.getValue(entry.value[0]) &&
+												date.getMonth() == this.getValue(entry.value[1])-1 &&
+												date.getDate() == this.getValue(entry.value[2])) {
 												result = true;
 												if ($.isArray(entry.value)) {
 													var tmp_validated = definition.validated;
@@ -279,45 +280,49 @@ https://github.com/fra-iesus/tdp
 								}
 								break;
 							case 'validator':
-								self.options('validationMessageHide')(validation_msg_el);
-								self.options('validationOkHide')(validation_ok);
-								var working_el = $(getByOuterElement(self.options('validationWorkingElement'), name)).first();
-								self.options('validationWorkingShow')(working_el);
-								later = true;
-								var request = $.ajax({
-									url: entry.value,
-									type: 'POST',
-									data: self.options('validatorRequestProcessor')(value, entry.params),
-									dataType: 'json',
-									timeout: 5000,
-									cache: false,
-									success: function(data) {
-										var message = self.options('validatorResponseProcessor')(data);
-										var result = false;
-										if (typeof message === 'string') {
-											result = self.options('validationMessageProcessor')([message]);
-										} else {
-											result = message ? entry.message : false;
-										}
-										if (!result) {
-											definition.validated = 1;
-											self.options('validationOkShow')(validation_ok);
-										} else {
-											definition.validated = 0;
-											validation_msg.html(result);
-											self.options('validationMessageShow')(validation_msg_el);
-										}
-									},
-									error: function(data) {
-											definition.validated = 0;
-											result = self.options('validationMessageProcessor')([entry.message]);
-											validation_msg.html(result);
-											self.options('validationMessageShow')(validation_msg_el);
-									},
-									async: true
-								}).always(function () {
-									self.options('validationWorkingHide')(working_el);
-								});
+								if (value === definition.value && definition.prevalidated) {
+									result = true;
+								} else {
+									self.options('validationMessageHide')(validation_msg_el);
+									self.options('validationOkHide')(validation_ok);
+									var working_el = $(getByOuterElement(self.options('validationWorkingElement'), name)).first();
+									self.options('validationWorkingShow')(working_el);
+									later = true;
+									var request = $.ajax({
+										url: entry.value,
+										type: 'POST',
+										data: JSON.stringify( self.options('validatorRequestProcessor')(value, entry.params) ),
+										dataType: 'json',
+										timeout: 5000,
+										cache: false,
+										success: function(data) {
+											var message = self.options('validatorResponseProcessor')(data);
+											var result = false;
+											if (typeof message === 'string') {
+												result = self.options('validationMessageProcessor')([message]);
+											} else {
+												result = message ? entry.message : false;
+											}
+											if (!result) {
+												definition.validated = 1;
+												self.options('validationOkShow')(validation_ok);
+											} else {
+												definition.validated = 0;
+												validation_msg.html(result);
+												self.options('validationMessageShow')(validation_msg_el);
+											}
+										},
+										error: function(data) {
+												definition.validated = 0;
+												result = self.options('validationMessageProcessor')([entry.message]);
+												validation_msg.html(result);
+												self.options('validationMessageShow')(validation_msg_el);
+										},
+										async: true
+									}).always(function () {
+										self.options('validationWorkingHide')(working_el);
+									});
+								}
 								break;
 							default:
 								console.warn('Unknown condition type "' + entry.type + '"');
@@ -402,7 +407,9 @@ https://github.com/fra-iesus/tdp
 		// validator
 		Object.keys(this._parameters.values).forEach(function(key) {
 			var input = self._parameters.values[key];
-			input.validated = null;
+			if (!input.validated) {
+				input.validated = null;
+			}
 			input.old_value = null;
 			var match = false;
 			var revalidate = false;
@@ -541,7 +548,7 @@ https://github.com/fra-iesus/tdp
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
-				return self.options('submitMethod')();
+				return self.options('submitMethod')(self);
 			}
 			return true;
 		};
