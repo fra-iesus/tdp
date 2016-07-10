@@ -516,8 +516,7 @@ https://github.com/fra-iesus/tdp
 			});
 		});
 
-		// submit form
-		this.submitForm = function(ev) {
+		this.revalidateAll = function(ev) {
 			var topElement = null;
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
@@ -539,6 +538,14 @@ https://github.com/fra-iesus/tdp
 				$('html, body').animate({
 					scrollTop: topElement
 				}, self.options('scrollToErrorDuration'));
+				return false;
+			}
+			return true;
+		};
+
+		// submit form
+		this.submitForm = function(ev) {
+			if (!self.revalidateAll()) {
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
