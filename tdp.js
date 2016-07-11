@@ -115,7 +115,8 @@ https://github.com/fra-iesus/tdp
 
 		//get input element
 		function getInput(name) {
-			var element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+			var filter = self._parameters.values[name].type === 'radio' ? ':checked' : '';
+			var element = $el.find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
 				return element;
 			}
@@ -126,9 +127,6 @@ https://github.com/fra-iesus/tdp
 		this.getValue = function (name) {
 			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
 			if (element) {
-				if (element.is(':radio')) {
-					return element.filter(':checked').val();
-				}
 				return element.val();
 			}
 			return null;
@@ -141,7 +139,7 @@ https://github.com/fra-iesus/tdp
 				var self = this;
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
-					var value = self.getValue($input);
+					var value = self.getValue(name);
 					var validation_msg = $(getByOuterElement(self.options('validationMessageElement'), name)).first();
 					var validation_msg_el = $(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
 					var validation_ok = $(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
@@ -280,7 +278,7 @@ https://github.com/fra-iesus/tdp
 								}
 								break;
 							case 'validator':
-								if (value === definition.value && definition.prevalidated) {
+								if (value == definition.value && definition.prevalidated) {
 									result = true;
 								} else {
 									self.options('validationMessageHide')(validation_msg_el);
