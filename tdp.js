@@ -518,7 +518,7 @@ https://github.com/fra-iesus/tdp
 			});
 		});
 
-		this.revalidateAll = function(partial) {
+		this.revalidateAll = function(partial, skip_validators) {
 			var topElement = null;
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
@@ -526,7 +526,7 @@ https://github.com/fra-iesus/tdp
 				if (!input.validated || input.revalidate) {
 					var element = getInput(key);
 					if (!partial || input.validated === null || input.revalidate) {
-						self.validate(element);
+						self.validate(element, skip_validators);
 					}
 					if (!input.validated && input.validated !== null) {
 						topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
