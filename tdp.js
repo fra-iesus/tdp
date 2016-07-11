@@ -433,8 +433,8 @@ https://github.com/fra-iesus/tdp
 				input_element = $(this);
 				if (input.type === 'select') {
 					if (input.interval || input.values) {
+						// input_element.find("option").remove();
 						// for select set allowed values if defined
-						input_element.find("option").remove();
 						if (input.values) {
 							input.values.some(function(entry) {
 								var setting = [];
