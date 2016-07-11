@@ -140,15 +140,15 @@ https://github.com/fra-iesus/tdp
 			if ( $input.is('input,textarea,select') ) {
 				var self = this;
 				var name = $input.attr('name');
-				if ( name in this._parameters.values ) {
-					var value = this.getValue($input);
+				if ( name in self._parameters.values ) {
+					var value = self.getValue($input);
 					var validation_msg = $(getByOuterElement(self.options('validationMessageElement'), name)).first();
 					var validation_msg_el = $(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
 					var validation_ok = $(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
-					var definition = this._parameters.values[name];
+					var definition = self._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
-							if (this.getValue(definition.match) == value) {
+							if (self.getValue(definition.match) == value) {
 								return;
 							}
 						} else {
@@ -241,7 +241,7 @@ https://github.com/fra-iesus/tdp
 									if (!self.getValue(entry.value[0]) || !self.getValue(entry.value[1]) || !self.getValue(entry.value[2])) {
 										skip = true;
 									} else {
-										date = new Date(self.getValue(entry.value[0]), self.getValue(entry.value[1])-1, this.getValue(entry.value[2]));
+										date = new Date(self.getValue(entry.value[0]), self.getValue(entry.value[1])-1, self.getValue(entry.value[2]));
 									}
 								} else {
 									date = new Date(value);
@@ -338,18 +338,18 @@ https://github.com/fra-iesus/tdp
 					if (!skipped) {
 						definition.validated = (results.length === 0);
 					}
-					var result = this.options('validationMessageProcessor')(results);
+					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
-						this.options('validationMessageHide')(validation_msg_el);
-						if (!skipped && !later && !(definition.match && !this._parameters.values[definition.match].validated)) {
-							this.options('validationOkShow')(validation_ok);
+						self.options('validationMessageHide')(validation_msg_el);
+						if (!skipped && !later && !(definition.match && !self._parameters.values[definition.match].validated)) {
+							self.options('validationOkShow')(validation_ok);
 						} else {
-							this.options('validationOkHide')(validation_ok);
+							self.options('validationOkHide')(validation_ok);
 						}
 					} else {
 						validation_msg.html(result);
-						this.options('validationMessageShow')(validation_msg_el);
-						this.options('validationOkHide')(validation_ok);
+						self.options('validationMessageShow')(validation_msg_el);
+						self.options('validationOkHide')(validation_ok);
 					}
 					return (!result);
 				} else {
