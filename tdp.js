@@ -448,7 +448,7 @@ https://github.com/fra-iesus/tdp
 									option.attr("disabled");
 								}
 								if (input.value == setting[1]) {
-									option.attr("selected");
+									option.attr("selected", "selected");
 								}
 								input_element.append(option);
 							});
