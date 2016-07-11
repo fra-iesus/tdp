@@ -516,14 +516,14 @@ https://github.com/fra-iesus/tdp
 			});
 		});
 
-		this.revalidateAll = function(ev) {
+		this.revalidateAll = function(partial) {
 			var topElement = null;
 			var i = 0;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (!input.validated || input.revalidate) {
 					var element = getInput(key);
-					if (input.validated === null || input.revalidate) {
+					if (!partial || input.validated === null || input.revalidate) {
 						self.validate(element);
 					}
 					if (!input.validated && input.validated !== null) {
@@ -545,7 +545,7 @@ https://github.com/fra-iesus/tdp
 
 		// submit form
 		this.submitForm = function(ev) {
-			if (!self.revalidateAll()) {
+			if (!self.revalidateAll(true)) {
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
