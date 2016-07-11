@@ -447,6 +447,9 @@ https://github.com/fra-iesus/tdp
 								if (entry[2]) {
 									option.attr("disabled");
 								}
+								if (input.value == setting[1]) {
+									option.attr("selected");
+								}
 								input_element.append(option);
 							});
 						}
@@ -466,7 +469,7 @@ https://github.com/fra-iesus/tdp
 				}
 				if (input.type === 'radio') {
 					if (input.value) {
-						input_element.filter('[value=' + input.value + ']').prop( "checked", true );
+						input_element.filter('[value="' + input.value + '"]').prop( "checked", true );
 					}
 					input_element.on('click', function() {
 						self.validate(this);
