@@ -165,10 +165,6 @@ https://github.com/fra-iesus/tdp
 					if (skip_validators) {
 						skipped = true;
 					}
-					if (!definition.conditions || !definition.conditions.length) {
-						definition.validated = true;
-						return true;
-					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
 						self.options('validationOkHide')(validation_ok);
 						if (definition.empty) {
@@ -180,6 +176,10 @@ https://github.com/fra-iesus/tdp
 							definition.validated = false;
 							return false;
 						}
+					}
+					if (!definition.conditions || !definition.conditions.length) {
+						definition.validated = true;
+						return true;
 					}
 					definition.conditions.some(function(entry) {
 						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
