@@ -168,6 +168,12 @@ https://github.com/fra-iesus/tdp
 						definition.validated = true;
 						return true;
 					}
+					if (definition.empty && (
+						Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) ) {
+						definition.validated = true;
+						self.options('validationOkHide')(validation_ok);
+						return true;
+					}
 					definition.conditions.some(function(entry) {
 						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
 							return false;
