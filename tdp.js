@@ -9,6 +9,7 @@ https://github.com/fra-iesus/tdp
 		var self = this;
 		// defaults
 		this._defaults = {
+			errorMessageEmptyInput: 'Field is mandatory',
 			scrollToErrorDuration: 2000,
 			dialogShowDuration: 500,
 			dialogCloseDuration: 500,
@@ -168,11 +169,17 @@ https://github.com/fra-iesus/tdp
 						definition.validated = true;
 						return true;
 					}
-					if (definition.empty && (
-						Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) ) {
-						definition.validated = true;
+					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
 						self.options('validationOkHide')(validation_ok);
-						return true;
+						if (definition.empty) {
+							definition.validated = true;
+							return true;
+						} else {
+							validation_msg.html(self.options('errorMessageEmptyInput'));
+							self.options('validationMessageShow')(validation_msg_el);
+							definition.validated = false;
+							return false;
+						}
 					}
 					definition.conditions.some(function(entry) {
 						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
