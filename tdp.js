@@ -144,8 +144,27 @@ https://github.com/fra-iesus/tdp
 				} else {
 					return $el.find('input[name="' + name + '"]').prop( "checked", false );
 				}
+			} else if (self._parameters.values[name].type === 'select') {
+				getInput(name).selectedIndex = -1;
 			}
 			return getInput(name).val(value);
+		};
+
+		this.reset = function () {
+			var self = this;
+			Object.keys(this._parameters.values).forEach(function(key) {
+				var input = self._parameters.values[key];
+				if (input.type !== 'hidden') {
+					input.validated = null;
+					input.old_value = null;
+					self.setValue(key, input.value);
+					self.options('validationMessageHide')($el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+					self.options('validationOkHide')($el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
+					if (input.value && self.options('prevalidation')) {
+						self.validate(key);
+					}
+				}
+			});
 		};
 
 		// validate input
