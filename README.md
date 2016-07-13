@@ -129,6 +129,10 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- added notEmptyAsValidated parameter
+- added animationSpeed and animationFastSpeed parameters
+- added errorMessageEmptyInput parameter
+- added prevalidation switch
 - added 'empty' attribute for input
 - fixed radios processing
 - better work with elements on page with multiple forms
