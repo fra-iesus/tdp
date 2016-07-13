@@ -136,6 +136,18 @@ https://github.com/fra-iesus/tdp
 			return null;
 		};
 
+		//set value to input by input name
+		this.setValue = function (name, value) {
+			if (self._parameters.values[name].type === 'radio') {
+				if (value) {
+					return $el.find('input[name="' + name + '"]').filter('[value="' + value + '"]').prop( "checked", true );
+				} else {
+					return $el.find('input[name="' + name + '"]').prop( "checked", false );
+				}
+			}
+			return getInput(name).val(value);
+		};
+
 		// validate input
 		this.validate = function( input, skip_validators ) {
 			if (typeof input === 'string') {
