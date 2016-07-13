@@ -145,7 +145,7 @@ https://github.com/fra-iesus/tdp
 					return $el.find('input[name="' + name + '"]').prop( "checked", false );
 				}
 			} else if (self._parameters.values[name].type === 'select') {
-				getInput(name).selectedIndex = -1;
+				getInput(name).prop('selectedIndex',0);
 			}
 			return getInput(name).val(value);
 		};
