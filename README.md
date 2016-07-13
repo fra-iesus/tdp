@@ -129,6 +129,7 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- added methods reset and setValue
 - hidden inputs are not validated anymore
 - added notEmptyAsValidated parameter
 - added animationSpeed and animationFastSpeed parameters
