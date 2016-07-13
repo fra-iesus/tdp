@@ -138,6 +138,12 @@ https://github.com/fra-iesus/tdp
 
 		// validate input
 		this.validate = function( input, skip_validators ) {
+			if (typeof input === 'string') {
+				if (this._parameters.values[input].type === 'hidden') {
+					this._parameters.values[input].validated = true;
+					return true;
+				}
+			}
 			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? getInput(input) : $(input)));
 			if ( $input.is('input,textarea,select') ) {
 				var self = this;
