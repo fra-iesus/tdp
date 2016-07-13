@@ -19,6 +19,7 @@ https://github.com/fra-iesus/tdp
 			validationOkElement: 'span.tdp-vld-ok',
 			validationOkText: '✓',
 			prevalidation: true,
+			notEmptyAsValidated: true,
 			validationOkShow: function(el) {
 				return el.fadeIn(self.options('animationSpeed'));
 			},
@@ -167,7 +168,7 @@ https://github.com/fra-iesus/tdp
 					if (skip_validators) {
 						skipped = true;
 					}
-					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
+					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
 						self.options('validationOkHide')(validation_ok);
 						if (definition.empty) {
 							definition.validated = true;
@@ -181,6 +182,9 @@ https://github.com/fra-iesus/tdp
 					}
 					if (!definition.conditions || !definition.conditions.length) {
 						definition.validated = true;
+						if (self.options('notEmptyAsValidated')) {
+							self.options('validationOkShow')(validation_ok);
+						}
 						return true;
 					}
 					definition.conditions.some(function(entry) {
