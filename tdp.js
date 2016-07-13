@@ -9,6 +9,8 @@ https://github.com/fra-iesus/tdp
 		var self = this;
 		// defaults
 		this._defaults = {
+			animationSpeed: 'slow',
+			animationFastSpeed: 'fast',
 			errorMessageEmptyInput: 'Field is mandatory',
 			scrollToErrorDuration: 2000,
 			dialogShowDuration: 500,
@@ -18,17 +20,17 @@ https://github.com/fra-iesus/tdp
 			validationOkText: '✓',
 			prevalidation: true,
 			validationOkShow: function(el) {
-				return el.fadeIn('slow');
+				return el.fadeIn(self.options('animationSpeed'));
 			},
 			validationOkHide: function(el) {
-				return el.fadeOut('fast');
+				return el.fadeOut(self.options('animationFastSpeed'));
 			},
 			validationWorkingElement: 'span.tdp-vld-working',
 			validationWorkingShow: function(el) {
-				return el.fadeIn('slow');
+				return el.fadeIn(self.options('animationSpeed'));
 			},
 			validationWorkingHide: function(el) {
-				return el.fadeOut('fast');
+				return el.fadeOut(self.options('animationFastSpeed'));
 			},
 			validationMessageElement: 'span.tdp-vld-msg',
 			validationMessageSeparator: '<br />',
@@ -37,13 +39,13 @@ https://github.com/fra-iesus/tdp
 			},
 			validationMessageFlashDelay: 300,
 			validationMessageFlash: function(el) {
-				return el.fadeIn('slow').fadeOut('slow').fadeIn('slow').fadeOut('slow').fadeIn('slow');
+				return el.fadeIn(self.options('animationSpeed')).fadeOut(self.options('animationSpeed')).fadeIn(self.options('animationSpeed')).fadeOut(self.options('animationSpeed')).fadeIn(self.options('animationSpeed'));
 			},
 			validationMessageShow: function(el) {
-				return el.fadeIn('slow');
+				return el.fadeIn(self.options('animationSpeed'));
 			},
 			validationMessageHide: function(el) {
-				return el.fadeOut('fast');
+				return el.fadeOut(self.options('animationFastSpeed'));
 			},
 			validatorRequestProcessor: function(value, params) {
 				return { data: value, params: params };
@@ -141,9 +143,9 @@ https://github.com/fra-iesus/tdp
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
-					var validation_msg = $(getByOuterElement(self.options('validationMessageElement'), name)).first();
-					var validation_msg_el = $(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
-					var validation_ok = $(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
+					var validation_msg = $el.find(getByOuterElement(self.options('validationMessageElement'), name)).first();
+					var validation_msg_el = $el.find(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
+					var validation_ok = $el.find(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
 					var definition = self._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
@@ -503,12 +505,12 @@ https://github.com/fra-iesus/tdp
 						val_element = val_element.next('label[for="' + val_element.attr('id') + '"]');
 					}
 				}
-				if (!$(getByOuterElement(self.options('validationMessageElement'), key)).length && !$(getByOuterElement(self.options('validationOkElement'), key)).length) {
+				if (!$el.find(getByOuterElement(self.options('validationMessageElement'), key)).length && !$el.find(getByOuterElement(self.options('validationOkElement'), key)).length) {
 					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
 						after(createElement(self.options('validationOkElement'), self.options('validationOkText')).attr('name', key).hide());
 				} else {
-					self.options('validationMessageHide')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-					self.options('validationOkHide')($(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
+					self.options('validationMessageHide')($el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+					self.options('validationOkHide')($el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
 				}
 				var has_validator = false;
 				if (input.conditions && input.conditions.length) {
@@ -520,10 +522,10 @@ https://github.com/fra-iesus/tdp
 					});
 				}
 				if (has_validator) {
-					if (!$(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
+					if (!$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 					} else {
-						self.options('validationWorkingHide')($(outerElement(self.options('validationWorkingElement')) + '[name="' + key + '"]').first());
+						self.options('validationWorkingHide')($el.find(outerElement(self.options('validationWorkingElement')) + '[name="' + key + '"]').first());
 					}
 				}
 				if (input.value && self.options('prevalidation')) {
