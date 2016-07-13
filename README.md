@@ -129,6 +129,9 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- fixed radios processing
+- better work with elements on page with multiple forms
+
 ### 1.1
 2016-06-30
 - "good enough" release :-)
