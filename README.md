@@ -129,6 +129,7 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- added 'empty' attribute for input
 - fixed radios processing
 - better work with elements on page with multiple forms
 
