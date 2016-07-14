@@ -118,18 +118,21 @@ https://github.com/fra-iesus/tdp
 		}
 
 		//get input element
-		function getInput(name) {
-			var filter = self._parameters.values[name].type === 'radio' ? ':checked' : '';
+		this.getInput = function (name) {
+			if (!this._parameters.values[name]) {
+				return null;
+			}
+			var filter = this._parameters.values[name].type === 'radio' ? ':checked' : '';
 			var element = $el.find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
 				return element;
 			}
 			return null;
-		}
+		};
 
 		//get value from input name
 		this.getValue = function (name) {
-			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? getInput(name) : $(name)));
+			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? this.getInput(name) : $(name)));
 			if (element) {
 				return element.val();
 			}
@@ -138,16 +141,16 @@ https://github.com/fra-iesus/tdp
 
 		//set value to input by input name
 		this.setValue = function (name, value) {
-			if (self._parameters.values[name].type === 'radio') {
+			if (this._parameters.values[name].type === 'radio') {
 				if (value) {
 					return $el.find('input[name="' + name + '"]').filter('[value="' + value + '"]').prop( "checked", true );
 				} else {
 					return $el.find('input[name="' + name + '"]').prop( "checked", false );
 				}
-			} else if (self._parameters.values[name].type === 'select') {
-				getInput(name).prop('selectedIndex',0);
+			} else if (this._parameters.values[name].type === 'select') {
+				this.getInput(name).prop('selectedIndex',0);
 			}
-			return getInput(name).val(value);
+			return this.getInput(name).val(value);
 		};
 
 		this.reset = function () {
@@ -175,7 +178,7 @@ https://github.com/fra-iesus/tdp
 					return true;
 				}
 			}
-			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? getInput(input) : $(input)));
+			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? this.getInput(input) : $(input)));
 			if ( $input.is('input,textarea,select') ) {
 				var self = this;
 				var name = $input.attr('name');
@@ -541,7 +544,7 @@ https://github.com/fra-iesus/tdp
 				}
 				var val_element = input_element;
 				if (input.type === 'radio') {
-					val_element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').last();
+					val_element = $el.find('input[name="' + key + '"]').last();
 					if (val_element.next('label[for="' + val_element.attr('id') + '"]').length) {
 						val_element = val_element.next('label[for="' + val_element.attr('id') + '"]');
 					}
@@ -578,10 +581,11 @@ https://github.com/fra-iesus/tdp
 		this.revalidateAll = function(partial, skip_validators) {
 			var topElement = null;
 			var i = 0;
+			var self = this;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (!input.validated || input.revalidate) {
-					var element = getInput(key);
+					var element = self.getInput(key);
 					if (!partial || input.validated === null || input.revalidate) {
 						self.validate(element, skip_validators);
 					}
