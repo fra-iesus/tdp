@@ -161,6 +161,49 @@ https://github.com/fra-iesus/tdp
 			return this.getInput(name).val(value);
 		};
 
+		this.showValidationMsg = function (name, msg) {
+			var input = this._parameters.values[name];
+			if (input.validation_msg_el) {
+				if (msg) {
+					input.validation_msg.html(msg);
+				}
+				this.options('validationMessageShow')(input.validation_msg_el);
+			}
+		};
+		this.hideValidationMsg = function (name) {
+			var input = this._parameters.values[name];
+			if (input.validation_msg_el) {
+				this.options('validationMessageHide')(input.validation_msg_el);
+				input.validation_msg.html('');
+			}
+		};
+
+		this.showValidationOk = function (name) {
+			var input = this._parameters.values[name];
+			if (input.validation_ok) {
+				this.options('validationOkShow')(input.validation_ok);
+			}
+		};
+		this.hideValidationOk = function (name) {
+			var input = this._parameters.values[name];
+			if (input.validation_ok) {
+				this.options('validationOkHide')(input.validation_ok);
+			}
+		};
+
+		this.showValidationWorking = function (name) {
+			var input = this._parameters.values[name];
+			if (input.validation_working) {
+				self.options('validationWorkingShow')(input.validation_working);
+			}
+		};
+		this.hideValidationWorking = function (name) {
+			var input = this._parameters.values[name];
+			if (input.validation_working) {
+				self.options('validationWorkingHide')(input.validation_working);
+			}
+		};
+
 		this.reset = function () {
 			var self = this;
 			Object.keys(this._parameters.values).forEach(function(key) {
@@ -169,9 +212,8 @@ https://github.com/fra-iesus/tdp
 					input.validated = null;
 					input.old_value = null;
 					self.setValue(key, input.value);
-					self.options('validationMessageHide')(input.validation_msg_el);
-					input.validation_msg.html('');
-					self.options('validationOkHide')(input.validation_ok);
+					self.hideValidationMsg(key);
+					self.hideValidationOk(key);
 					if (input.value && self.options('prevalidation')) {
 						self.validate(key);
 					}
@@ -215,13 +257,12 @@ https://github.com/fra-iesus/tdp
 						skipped = true;
 					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
-						self.options('validationOkHide')(definition.validation_ok);
+						self.hideValidationOk(name);
 						if (definition.empty) {
 							definition.validated = true;
 							return true;
 						} else {
-							definition.validation_msg.html(self.options('errorMessageEmptyInput'));
-							self.options('validationMessageShow')(definition.validation_msg_el);
+							self.showValidationMsg(name, self.options('errorMessageEmptyInput'));
 							definition.validated = false;
 							return false;
 						}
@@ -229,7 +270,7 @@ https://github.com/fra-iesus/tdp
 					if (!definition.conditions || !definition.conditions.length) {
 						definition.validated = true;
 						if (self.options('notEmptyAsValidated')) {
-							self.options('validationOkShow')(definition.validation_ok);
+							self.showValidationOk(name);
 						}
 						return true;
 					}
@@ -346,9 +387,9 @@ https://github.com/fra-iesus/tdp
 								if (value == definition.value && definition.prevalidated) {
 									result = true;
 								} else {
-									self.options('validationMessageHide')(definition.validation_msg_el);
-									self.options('validationOkHide')(definition.validation_ok);
-									self.options('validationWorkingShow')(definition.validation_working);
+									self.hideValidationMsg(name);
+									self.hideValidationOk(name);
+									self.showValidationWorking(name);
 									later = true;
 									var request = $.ajax({
 										url: entry.value,
@@ -367,22 +408,20 @@ https://github.com/fra-iesus/tdp
 											}
 											if (!result) {
 												definition.validated = 1;
-												self.options('validationOkShow')(definition.validation_ok);
+												self.showValidationOk(name);
 											} else {
 												definition.validated = 0;
-												definition.validation_msg.html(result);
-												self.options('validationMessageShow')(definition.validation_msg_el);
+												self.showValidationMsg(name, result);
 											}
 										},
 										error: function(data) {
 												definition.validated = 0;
 												result = self.options('validationMessageProcessor')([entry.message]);
-												definition.validation_msg.html(result);
-												self.options('validationMessageShow')(definition.validation_msg_el);
+												self.showValidationMsg(name, result);
 										},
 										async: true
 									}).always(function () {
-										self.options('validationWorkingHide')(definition.validation_working);
+										self.hideValidationWorking(name);
 									});
 								}
 								break;
@@ -402,16 +441,15 @@ https://github.com/fra-iesus/tdp
 					}
 					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
-						self.options('validationMessageHide')(definition.validation_msg_el);
+						self.hideValidationMsg(name);
 						if (!skipped && !later && !(definition.match && !self._parameters.values[definition.match].validated)) {
-							self.options('validationOkShow')(definition.validation_ok);
+							self.showValidationOk(name);
 						} else {
-							self.options('validationOkHide')(definition.validation_ok);
+							self.hideValidationOk(name);
 						}
 					} else {
-						validation_msg.html(result);
-						self.options('validationMessageShow')(definition.validation_msg_el);
-						self.options('validationOkHide')(definition.validation_ok);
+						self.showValidationMsg(name, result);
+						self.hideValidationOk(name);
 					}
 					return (!result);
 				} else {
@@ -556,9 +594,6 @@ https://github.com/fra-iesus/tdp
 				if (!$el.find(getByOuterElement(self.options('validationMessageElement'), key)).length && !$el.find(getByOuterElement(self.options('validationOkElement'), key)).length) {
 					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
 						after(createElement(self.options('validationOkElement'), self.options('validationOkText')).attr('name', key).hide());
-				} else {
-					self.options('validationMessageHide')($el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-					self.options('validationOkHide')($el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
 				}
 				var has_validator = false;
 				if (input.conditions && input.conditions.length) {
@@ -572,14 +607,15 @@ https://github.com/fra-iesus/tdp
 				if (has_validator) {
 					if (!$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
-					} else {
-						self.options('validationWorkingHide')($el.find(outerElement(self.options('validationWorkingElement')) + '[name="' + key + '"]').first());
 					}
 					input.validation_working = $el.find(getByOuterElement(self.options('validationWorkingElement'), key)).first();
 				}
 				input.validation_msg = $el.find(getByOuterElement(self.options('validationMessageElement'), key)).first();
 				input.validation_msg_el = $el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first();
 				input.validation_ok = $el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first();
+				self.hideValidationOk(key);
+				self.hideValidationMsg(key);
+				self.hideValidationWorking(key);
 
 				if (input.value && self.options('prevalidation')) {
 					self.validate(this);
