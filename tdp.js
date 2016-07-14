@@ -120,6 +120,7 @@ https://github.com/fra-iesus/tdp
 		//get input element
 		this.getInput = function (name) {
 			if (!this._parameters.values[name]) {
+				console.warn('Unknown input "' + name + '"');
 				return null;
 			}
 			var filter = this._parameters.values[name].type === 'radio' ? ':checked' : '';
@@ -127,6 +128,7 @@ https://github.com/fra-iesus/tdp
 			if (element.length) {
 				return element;
 			}
+			console.warn('Element for input "' + name + '" does not exist');
 			return null;
 		};
 
@@ -147,8 +149,14 @@ https://github.com/fra-iesus/tdp
 				} else {
 					return $el.find('input[name="' + name + '"]').prop( "checked", false );
 				}
-			} else if (this._parameters.values[name].type === 'select') {
-				this.getInput(name).prop('selectedIndex',0);
+			}
+			var input = this.getInput(name);
+			if (!input.length) {
+				console.warn('Element for input "' + name + '" does not exist');
+				return false;
+			}
+			if (this._parameters.values[name].type === 'select') {
+				input.prop('selectedIndex',0);
 			}
 			return this.getInput(name).val(value);
 		};
@@ -161,8 +169,9 @@ https://github.com/fra-iesus/tdp
 					input.validated = null;
 					input.old_value = null;
 					self.setValue(key, input.value);
-					self.options('validationMessageHide')($el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-					self.options('validationOkHide')($el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first());
+					self.options('validationMessageHide')(input.validation_msg_el);
+					input.validation_msg.html('');
+					self.options('validationOkHide')(input.validation_ok);
 					if (input.value && self.options('prevalidation')) {
 						self.validate(key);
 					}
@@ -184,9 +193,6 @@ https://github.com/fra-iesus/tdp
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
-					var validation_msg = $el.find(getByOuterElement(self.options('validationMessageElement'), name)).first();
-					var validation_msg_el = $el.find(outerElement(self.options('validationMessageElement')) + '[name="' + name + '"]').first();
-					var validation_ok = $el.find(outerElement(self.options('validationOkElement')) + '[name="' + name + '"]').first();
 					var definition = self._parameters.values[name];
 					if (value === definition.old_value) {
 						if (definition.match) {
@@ -209,13 +215,13 @@ https://github.com/fra-iesus/tdp
 						skipped = true;
 					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
-						self.options('validationOkHide')(validation_ok);
+						self.options('validationOkHide')(definition.validation_ok);
 						if (definition.empty) {
 							definition.validated = true;
 							return true;
 						} else {
-							validation_msg.html(self.options('errorMessageEmptyInput'));
-							self.options('validationMessageShow')(validation_msg_el);
+							definition.validation_msg.html(self.options('errorMessageEmptyInput'));
+							self.options('validationMessageShow')(definition.validation_msg_el);
 							definition.validated = false;
 							return false;
 						}
@@ -223,7 +229,7 @@ https://github.com/fra-iesus/tdp
 					if (!definition.conditions || !definition.conditions.length) {
 						definition.validated = true;
 						if (self.options('notEmptyAsValidated')) {
-							self.options('validationOkShow')(validation_ok);
+							self.options('validationOkShow')(definition.validation_ok);
 						}
 						return true;
 					}
@@ -340,10 +346,9 @@ https://github.com/fra-iesus/tdp
 								if (value == definition.value && definition.prevalidated) {
 									result = true;
 								} else {
-									self.options('validationMessageHide')(validation_msg_el);
-									self.options('validationOkHide')(validation_ok);
-									var working_el = $(getByOuterElement(self.options('validationWorkingElement'), name)).first();
-									self.options('validationWorkingShow')(working_el);
+									self.options('validationMessageHide')(definition.validation_msg_el);
+									self.options('validationOkHide')(definition.validation_ok);
+									self.options('validationWorkingShow')(definition.validation_working);
 									later = true;
 									var request = $.ajax({
 										url: entry.value,
@@ -362,22 +367,22 @@ https://github.com/fra-iesus/tdp
 											}
 											if (!result) {
 												definition.validated = 1;
-												self.options('validationOkShow')(validation_ok);
+												self.options('validationOkShow')(definition.validation_ok);
 											} else {
 												definition.validated = 0;
-												validation_msg.html(result);
-												self.options('validationMessageShow')(validation_msg_el);
+												definition.validation_msg.html(result);
+												self.options('validationMessageShow')(definition.validation_msg_el);
 											}
 										},
 										error: function(data) {
 												definition.validated = 0;
 												result = self.options('validationMessageProcessor')([entry.message]);
-												validation_msg.html(result);
-												self.options('validationMessageShow')(validation_msg_el);
+												definition.validation_msg.html(result);
+												self.options('validationMessageShow')(definition.validation_msg_el);
 										},
 										async: true
 									}).always(function () {
-										self.options('validationWorkingHide')(working_el);
+										self.options('validationWorkingHide')(definition.validation_working);
 									});
 								}
 								break;
@@ -397,16 +402,16 @@ https://github.com/fra-iesus/tdp
 					}
 					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
-						self.options('validationMessageHide')(validation_msg_el);
+						self.options('validationMessageHide')(definition.validation_msg_el);
 						if (!skipped && !later && !(definition.match && !self._parameters.values[definition.match].validated)) {
-							self.options('validationOkShow')(validation_ok);
+							self.options('validationOkShow')(definition.validation_ok);
 						} else {
-							self.options('validationOkHide')(validation_ok);
+							self.options('validationOkHide')(definition.validation_ok);
 						}
 					} else {
 						validation_msg.html(result);
-						self.options('validationMessageShow')(validation_msg_el);
-						self.options('validationOkHide')(validation_ok);
+						self.options('validationMessageShow')(definition.validation_msg_el);
+						self.options('validationOkHide')(definition.validation_ok);
 					}
 					return (!result);
 				} else {
@@ -490,7 +495,6 @@ https://github.com/fra-iesus/tdp
 				input_element = $(this);
 				if (input.type === 'select') {
 					if (input.interval || input.values) {
-						// input_element.find("option").remove();
 						// for select set allowed values if defined
 						if (input.values) {
 							input.values.some(function(entry) {
@@ -571,7 +575,12 @@ https://github.com/fra-iesus/tdp
 					} else {
 						self.options('validationWorkingHide')($el.find(outerElement(self.options('validationWorkingElement')) + '[name="' + key + '"]').first());
 					}
+					input.validation_working = $el.find(getByOuterElement(self.options('validationWorkingElement'), key)).first();
 				}
+				input.validation_msg = $el.find(getByOuterElement(self.options('validationMessageElement'), key)).first();
+				input.validation_msg_el = $el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first();
+				input.validation_ok = $el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first();
+
 				if (input.value && self.options('prevalidation')) {
 					self.validate(this);
 				}
