@@ -593,16 +593,18 @@ https://github.com/fra-iesus/tdp
 			var self = this;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
-				if (!input.validated || input.revalidate) {
-					var element = self.getInput(key);
-					if (!partial || input.validated === null || input.revalidate) {
-						self.validate(element, skip_validators);
-					}
-					if (!input.validated && input.validated !== null) {
-						topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
-						setTimeout( function() {
-							self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-						}, self.options('validationMessageFlashDelay')*i++);
+				if (input.type !== 'hidden') {
+					if (!input.validated || input.revalidate) {
+						var element = self.getInput(key);
+						if (!partial || input.validated === null || input.revalidate) {
+							self.validate(element, skip_validators);
+						}
+						if (!input.validated && input.validated !== null) {
+							topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
+							setTimeout( function() {
+								self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+							}, self.options('validationMessageFlashDelay')*i++);
+						}
 					}
 				}
 			});
