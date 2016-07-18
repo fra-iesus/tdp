@@ -127,6 +127,11 @@ https://github.com/fra-iesus/tdp
 			var element = $el.find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
 				return element;
+			} else if (filter) {
+				element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+				if (element.length) {
+					return element;
+				}
 			}
 			console.warn('Element for input "' + name + '" does not exist');
 			return null;
