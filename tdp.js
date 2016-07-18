@@ -121,29 +121,34 @@ https://github.com/fra-iesus/tdp
 		this.getInput = function (name) {
 			if (!this._parameters.values[name]) {
 				console.warn('Unknown input "' + name + '"');
-				return null;
+				return '';
 			}
 			var filter = this._parameters.values[name].type === 'radio' ? ':checked' : '';
 			var element = $el.find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
 				return element;
-			} else if (filter) {
+			} else if (filter !== '') {
 				element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
 				if (element.length) {
 					return element;
 				}
 			}
 			console.warn('Element for input "' + name + '" does not exist');
-			return null;
+			return '';
 		};
 
 		//get value from input name
 		this.getValue = function (name) {
-			var element = (name instanceof jQuery ? name : (typeof name === 'string' ? this.getInput(name) : $(name)));
+			var element = this.getInput(name);
 			if (element) {
+				if (element.attr('type') === 'radio') {
+					if (!element.prop("checked")) {
+						return '';
+					}
+				}
 				return element.val();
 			}
-			return null;
+			return '';
 		};
 
 		//set value to input by input name
@@ -576,17 +581,17 @@ https://github.com/fra-iesus/tdp
 						input_element.filter('[value="' + input.value + '"]').prop( "checked", true );
 					}
 					input_element.on('click', function() {
-						self.validate(this);
+						self.validate(key);
 					});
 				} else {
 					if (input.value) {
 						input_element.val(input.value);
 					}
 					input_element.on('input', function() {
-						self.validate(this, ['validator', 'min', 'not', 'match']);
+						self.validate(key, ['validator', 'min', 'not', 'match']);
 					});
 					input_element.on('change, blur', function() {
-						self.validate(this);
+						self.validate(key);
 					});
 				}
 				var val_element = input_element;
@@ -623,7 +628,7 @@ https://github.com/fra-iesus/tdp
 				self.hideValidationWorking(key);
 
 				if (input.value && self.options('prevalidation')) {
-					self.validate(this);
+					self.validate(key);
 				}
 			});
 		});
@@ -638,7 +643,7 @@ https://github.com/fra-iesus/tdp
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
 						if (!partial || input.validated === null || input.revalidate) {
-							self.validate(element, skip_validators);
+							self.validate(key, skip_validators);
 						}
 						if (!input.validated && input.validated !== null) {
 							topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
