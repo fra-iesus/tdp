@@ -259,6 +259,8 @@ https://github.com/fra-iesus/tdp
 					}
 					if (!skip_validators) {
 						definition.old_value = value;
+					} else {
+						definition.old_value = null;
 					}
 					var results = [];
 					var later = false;
