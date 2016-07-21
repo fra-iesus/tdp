@@ -449,7 +449,7 @@ https://github.com/fra-iesus/tdp
 						}
 						return false;
 					});
-					if (!skipped) {
+					if (!skipped && !later) {
 						definition.validated = (results.length === 0);
 					}
 					var result = self.options('validationMessageProcessor')(results);
