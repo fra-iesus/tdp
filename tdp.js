@@ -403,6 +403,7 @@ https://github.com/fra-iesus/tdp
 									self.hideValidationOk(name);
 									self.showValidationWorking(name);
 									later = true;
+									definition.validated = 0;
 									var request = $.ajax({
 										url: entry.value,
 										type: 'POST',
