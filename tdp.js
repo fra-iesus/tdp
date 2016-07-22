@@ -244,7 +244,6 @@ https://github.com/fra-iesus/tdp
 			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? this.getInput(input) : $(input)));
 			if ( $input.is('input,textarea,select') ) {
 				var self = this;
-				self.after_validators = null;
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
@@ -407,6 +406,7 @@ https://github.com/fra-iesus/tdp
 									self.showValidationWorking(name);
 									later = true;
 									definition.validated = 0;
+									self.validators_to_go++;
 									var request = $.ajax({
 										url: entry.value,
 										type: 'POST',
@@ -426,17 +426,28 @@ https://github.com/fra-iesus/tdp
 												definition.validated = 1;
 												self.showValidationOk(name);
 												if (self.validators_to_go > 0) {
-													if (--self.validators_to_go === 0 && self.after_validators !== null) {
+													self.validators_to_go--;
+													console.log('decreased remaining validators count to ' + self.validators_to_go);
+													console.log(self.after_validators);
+													if (self.validators_to_go === 0 && self.after_validators !== null) {
 														self.after_validators();
 													}
 												}
 											} else {
 												definition.validated = 0;
+												if (self.validators_to_go > 0) {
+													self.validators_to_go--;
+												}
+												self.after_validators = null;
 												self.showValidationMsg(name, result);
 											}
 										},
 										error: function(data) {
 												definition.validated = 0;
+												if (self.validators_to_go > 0) {
+													self.validators_to_go--;
+												}
+												self.after_validators = null;
 												result = self.options('validationMessageProcessor')([entry.message]);
 												self.showValidationMsg(name, result);
 										},
@@ -548,6 +559,7 @@ https://github.com/fra-iesus/tdp
 						return;
 					} else if (entry.type === 'validator') {
 						online_validator = true;
+						console.log('online validator found for input ' + key);
 						return;
 					}
 				});
@@ -610,6 +622,15 @@ https://github.com/fra-iesus/tdp
 						self.validate(key);
 					});
 				}
+				// 'enter' to submit form
+				if (!input_element.is('textarea')) {
+					input_element.keypress(function (e) {
+						if (e.which == 13) {
+							self.submitForm();
+							return false;
+						}
+					});
+				}
 				var val_element = input_element;
 				if (input.type === 'radio') {
 					val_element = $el.find('input[name="' + key + '"]').last();
@@ -655,14 +676,10 @@ https://github.com/fra-iesus/tdp
 			var self = this;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
-				self.validators_to_go = 0;
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
 						if (!partial || input.validated === null || input.revalidate) {
-							if (input.online_validator) {
-								self.validators_to_go++;
-							}
 							self.validate(key, skip_validators);
 						}
 						if (!input.validated && input.validated !== null) {
@@ -685,14 +702,14 @@ https://github.com/fra-iesus/tdp
 
 		// submit form
 		this.submitForm = function(ev) {
+			if (self.options('submitMethod') !== null) {
+				self.after_validators = function() {
+					return self.options('submitMethod')(self);
+				};
+			}
 			if (!self.revalidateAll(true)) {
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
-				}
-				if (self.validators_to_go > 0 && self.options('submitMethod') !== null) {
-					self.after_validators = function() {
-						return self.options('submitMethod')(self);
-					};
 				}
 				return false;
 			}
