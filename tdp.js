@@ -235,11 +235,9 @@ https://github.com/fra-iesus/tdp
 
 		// validate input
 		this.validate = function( input, skip_validators ) {
-			console.log('running validation for ' + input);
 			if (typeof input === 'string') {
 				if (this._parameters.values[input].type === 'hidden') {
 					this._parameters.values[input].validated = true;
-					console.log('validation for hidden input skipped.');
 					return true;
 				}
 			}
@@ -431,8 +429,6 @@ https://github.com/fra-iesus/tdp
 												self.showValidationOk(name);
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
-													console.log('decreased remaining validators count to ' + self.validators_to_go);
-													console.log(self.after_validators);
 													if (self.validators_to_go === 0 && self.after_validators !== null) {
 														self.after_validators();
 													}
@@ -559,9 +555,6 @@ https://github.com/fra-iesus/tdp
 						return;
 					} else if (entry.type === 'date') {
 						revalidate = true;
-						return;
-					} else if (entry.type === 'validator') {
-						console.log('online validator found for input ' + key);
 						return;
 					}
 				});
@@ -720,7 +713,8 @@ https://github.com/fra-iesus/tdp
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
-				return self.options('submitMethod')(self);
+				self.options('submitMethod')(self);
+				return false;
 			}
 			return true;
 		};
