@@ -235,9 +235,11 @@ https://github.com/fra-iesus/tdp
 
 		// validate input
 		this.validate = function( input, skip_validators ) {
+			console.log('running validation for ' + input);
 			if (typeof input === 'string') {
 				if (this._parameters.values[input].type === 'hidden') {
 					this._parameters.values[input].validated = true;
+					console.log('validation for hidden input skipped.');
 					return true;
 				}
 			}
@@ -248,7 +250,7 @@ https://github.com/fra-iesus/tdp
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
 					var definition = self._parameters.values[name];
-					if (value === definition.old_value) {
+					if (definition.old_value !== null && value === definition.old_value) {
 						if (definition.match) {
 							if (self.getValue(definition.match) == value) {
 								return;
@@ -272,6 +274,7 @@ https://github.com/fra-iesus/tdp
 					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
 						self.hideValidationOk(name);
+						self.hideValidationMsg(name);
 						if (definition.empty) {
 							definition.validated = true;
 							return true;
@@ -405,7 +408,7 @@ https://github.com/fra-iesus/tdp
 									self.hideValidationOk(name);
 									self.showValidationWorking(name);
 									later = true;
-									definition.validated = 0;
+									definition.validated = false;
 									self.validators_to_go++;
 									var request = $.ajax({
 										url: entry.value,
@@ -423,7 +426,7 @@ https://github.com/fra-iesus/tdp
 												result = message ? entry.message : false;
 											}
 											if (!result) {
-												definition.validated = 1;
+												definition.validated = true;
 												self.showValidationOk(name);
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
@@ -434,7 +437,7 @@ https://github.com/fra-iesus/tdp
 													}
 												}
 											} else {
-												definition.validated = 0;
+												definition.validated = false;
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
 												}
@@ -443,7 +446,7 @@ https://github.com/fra-iesus/tdp
 											}
 										},
 										error: function(data) {
-												definition.validated = 0;
+												definition.validated = false;
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
 												}
@@ -547,7 +550,6 @@ https://github.com/fra-iesus/tdp
 			input.old_value = null;
 			var match = false;
 			var revalidate = false;
-			var online_validator = false;
 			if (input.conditions && input.conditions.length) {
 				input.conditions.some(function(entry) {
 					if (entry.type === 'match') {
@@ -558,7 +560,6 @@ https://github.com/fra-iesus/tdp
 						revalidate = true;
 						return;
 					} else if (entry.type === 'validator') {
-						online_validator = true;
 						console.log('online validator found for input ' + key);
 						return;
 					}
@@ -566,7 +567,6 @@ https://github.com/fra-iesus/tdp
 			}
 			input.match = match;
 			input.revalidate = revalidate;
-			input.online_validator = online_validator;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
 				if (input.type === 'select') {
@@ -682,7 +682,7 @@ https://github.com/fra-iesus/tdp
 						if (!partial || input.validated === null || input.revalidate) {
 							self.validate(key, skip_validators);
 						}
-						if (!input.validated && input.validated !== null) {
+						if (input.validated === false) {
 							topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
 							setTimeout( function() {
 								self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
