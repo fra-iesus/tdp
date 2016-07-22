@@ -274,8 +274,8 @@ https://github.com/fra-iesus/tdp
 					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
 						self.hideValidationOk(name);
-						self.hideValidationMsg(name);
 						if (definition.empty) {
+							self.hideValidationMsg(name);
 							definition.validated = true;
 							return true;
 						} else {
@@ -286,6 +286,7 @@ https://github.com/fra-iesus/tdp
 					}
 					if (!definition.conditions || !definition.conditions.length) {
 						definition.validated = true;
+						self.hideValidationMsg(name);
 						if (self.options('notEmptyAsValidated')) {
 							self.showValidationOk(name);
 						}
