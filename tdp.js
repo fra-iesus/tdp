@@ -66,6 +66,8 @@ https://github.com/fra-iesus/tdp
 		this._options = $.extend( true, {}, this._defaults, options );
 		this._parameters = parameters;
 		this._parameters.element = $el;
+		this.validators_to_go = 0;
+		this.after_validators = null;
 
 		// options - getter/setter
 		this.options = function(options) {
@@ -242,6 +244,7 @@ https://github.com/fra-iesus/tdp
 			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? this.getInput(input) : $(input)));
 			if ( $input.is('input,textarea,select') ) {
 				var self = this;
+				self.after_validators = null;
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
@@ -422,6 +425,11 @@ https://github.com/fra-iesus/tdp
 											if (!result) {
 												definition.validated = 1;
 												self.showValidationOk(name);
+												if (self.validators_to_go > 0) {
+													if (--self.validators_to_go === 0 && self.after_validators !== null) {
+														self.after_validators();
+													}
+												}
 											} else {
 												definition.validated = 0;
 												self.showValidationMsg(name, result);
@@ -528,6 +536,7 @@ https://github.com/fra-iesus/tdp
 			input.old_value = null;
 			var match = false;
 			var revalidate = false;
+			var online_validator = false;
 			if (input.conditions && input.conditions.length) {
 				input.conditions.some(function(entry) {
 					if (entry.type === 'match') {
@@ -537,11 +546,15 @@ https://github.com/fra-iesus/tdp
 					} else if (entry.type === 'date') {
 						revalidate = true;
 						return;
+					} else if (entry.type === 'validator') {
+						online_validator = true;
+						return;
 					}
 				});
 			}
 			input.match = match;
 			input.revalidate = revalidate;
+			input.online_validator = online_validator;
 			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
 				input_element = $(this);
 				if (input.type === 'select') {
@@ -642,10 +655,14 @@ https://github.com/fra-iesus/tdp
 			var self = this;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
+				self.validators_to_go = 0;
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
 						if (!partial || input.validated === null || input.revalidate) {
+							if (input.online_validator) {
+								self.validators_to_go++;
+							}
 							self.validate(key, skip_validators);
 						}
 						if (!input.validated && input.validated !== null) {
@@ -671,6 +688,11 @@ https://github.com/fra-iesus/tdp
 			if (!self.revalidateAll(true)) {
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
+				}
+				if (self.validators_to_go > 0 && self.options('submitMethod') !== null) {
+					self.after_validators = function() {
+						return self.options('submitMethod')(self);
+					};
 				}
 				return false;
 			}
