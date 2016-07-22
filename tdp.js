@@ -703,12 +703,14 @@ https://github.com/fra-iesus/tdp
 
 		// submit form
 		this.submitForm = function(ev) {
-			if (self.options('submitMethod') !== null) {
-				self.after_validators = function() {
-					return self.options('submitMethod')(self);
-				};
-			}
 			if (!self.revalidateAll(true)) {
+				if (self.validators_to_go) {
+					if (self.options('submitMethod') !== null) {
+						self.after_validators = function() {
+							return self.options('submitMethod')(self);
+						};
+					}
+				}
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
