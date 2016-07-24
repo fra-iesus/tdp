@@ -625,6 +625,14 @@ https://github.com/fra-iesus/tdp
 						}
 					});
 				}
+				// autofill
+				input_element.on('change.autofill DOMAttrModified.autofill keydown.autofill propertychange.autofill', function (e) {
+					$timeout( function () {
+						if (input_element.val() !== '') {
+							input_element.trigger('input');
+						}
+					}, 0);
+				});
 				var val_element = input_element;
 				if (input.type === 'radio') {
 					val_element = $el.find('input[name="' + key + '"]').last();
