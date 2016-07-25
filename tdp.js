@@ -620,6 +620,7 @@ https://github.com/fra-iesus/tdp
 				if (!input_element.is('textarea')) {
 					input_element.keypress(function (e) {
 						if (e.which == 13) {
+							self.validate($(e.currentTarget).attr('name'));
 							self.submitForm();
 							return false;
 						}
