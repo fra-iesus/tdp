@@ -627,7 +627,7 @@ https://github.com/fra-iesus/tdp
 				}
 				// autofill
 				input_element.on('change.autofill DOMAttrModified.autofill keydown.autofill propertychange.autofill', function (e) {
-					$timeout( function () {
+					setTimeout( function () {
 						if (input_element.val() !== '') {
 							input_element.trigger('input');
 						}
