@@ -675,12 +675,16 @@ https://github.com/fra-iesus/tdp
 
 		this.revalidateAll = function(partial, skip_validators) {
 			var topElement = null;
+			var all_ok = true;
 			var i = 0;
 			var self = this;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (input.type !== 'hidden') {
-					if (!input.validated || input.revalidate) {
+					if (self.validators_to_go > 0) {
+						all_ok = false;
+					} else if (!input.validated || input.revalidate) {
+						all_ok = false;
 						var element = self.getInput(key);
 						if (!partial || input.validated === null || input.revalidate) {
 							self.validate(key, skip_validators);
@@ -694,10 +698,12 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
-			if (topElement) {
-				$('html, body').animate({
-					scrollTop: topElement
-				}, self.options('scrollToErrorDuration'));
+			if (!all_ok) {
+				if (topElement) {
+					$('html, body').animate({
+						scrollTop: topElement
+					}, self.options('scrollToErrorDuration'));
+				}
 				return false;
 			}
 			return true;
