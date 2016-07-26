@@ -115,13 +115,13 @@ https://github.com/fra-iesus/tdp
 
 		// show dialogue
 		this.show = function() {
-			$el.show(this.options('dialogShowDuration'));
-			return $el;
+			$(this._parameters.element).show(this.options('dialogShowDuration'));
+			return this;
 		};
 		// hide dialogue
 		this.hide = function() {
-			$el.hide(this.options('dialogCloseDuration'));
-			return $el;
+			$(this._parameters.element).hide(this.options('dialogCloseDuration'));
+			return this;
 		};
 
 		function outerElement(el) {
@@ -141,11 +141,11 @@ https://github.com/fra-iesus/tdp
 				return '';
 			}
 			var filter = this._parameters.values[name].type === 'radio' ? ':checked' : '';
-			var element = $el.find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
+			var element = $(this._parameters.element).find('input[name="' + name + '"]' + filter + ',textarea[name="' + name + '"],select[name="' + name + '"]').first();
 			if (element.length) {
 				return element;
 			} else if (filter !== '') {
-				element = $el.find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
+				element = $(this._parameters.element).find('input[name="' + name + '"],textarea[name="' + name + '"],select[name="' + name + '"]').first();
 				if (element.length) {
 					return element;
 				}
@@ -172,9 +172,9 @@ https://github.com/fra-iesus/tdp
 		this.setValue = function (name, value) {
 			if (this._parameters.values[name].type === 'radio') {
 				if (value) {
-					return $el.find('input[name="' + name + '"]').filter('[value="' + value + '"]').prop( "checked", true );
+					return $(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').prop( "checked", true );
 				} else {
-					return $el.find('input[name="' + name + '"]').prop( "checked", false );
+					return $(this._parameters.element).find('input[name="' + name + '"]').prop( "checked", false );
 				}
 			}
 			var input = this.getInput(name);
@@ -183,51 +183,53 @@ https://github.com/fra-iesus/tdp
 				return false;
 			}
 			if (this._parameters.values[name].type === 'select') {
-				input.prop('selectedIndex',0);
+				input.selectedIndex = -1;
 			}
 			return this.getInput(name).val(value);
 		};
 
 		this.showValidationMsg = function (name, msg) {
-			var input = this._parameters.values[name];
-			if (input.validation_msg_el) {
+			var validation_msg_el = $(this._parameters.element).find(outerElement(this.options('validationMessageElement')) + '[name="' + name + '"]').first();
+			if (validation_msg_el) {
 				if (msg) {
-					input.validation_msg.html(msg);
+					var validation_msg = $(this._parameters.element).find(getByOuterElement(this.options('validationMessageElement'), name)).first();
+					validation_msg.html(msg);
 				}
-				this.options('validationMessageShow')(input.validation_msg_el);
+				this.options('validationMessageShow')(validation_msg_el);
 			}
 		};
 		this.hideValidationMsg = function (name) {
-			var input = this._parameters.values[name];
-			if (input.validation_msg_el) {
-				this.options('validationMessageHide')(input.validation_msg_el);
-				input.validation_msg.html('');
+			var validation_msg_el = $(this._parameters.element).find(outerElement(this.options('validationMessageElement')) + '[name="' + name + '"]').first();
+			if (validation_msg_el) {
+				this.options('validationMessageHide')(validation_msg_el);
+				var validation_msg = $(this._parameters.element).find(getByOuterElement(this.options('validationMessageElement'), name)).first();
+				validation_msg.html('');
 			}
 		};
 
 		this.showValidationOk = function (name) {
-			var input = this._parameters.values[name];
-			if (input.validation_ok) {
-				this.options('validationOkShow')(input.validation_ok);
+			var validation_ok = $(this._parameters.element).find(outerElement(this.options('validationOkElement')) + '[name="' + name + '"]').first();
+			if (validation_ok) {
+				this.options('validationOkShow')(validation_ok);
 			}
 		};
 		this.hideValidationOk = function (name) {
-			var input = this._parameters.values[name];
-			if (input.validation_ok) {
-				this.options('validationOkHide')(input.validation_ok);
+			var validation_ok = $(this._parameters.element).find(outerElement(this.options('validationOkElement')) + '[name="' + name + '"]').first();
+			if (validation_ok) {
+				this.options('validationOkHide')(validation_ok);
 			}
 		};
 
 		this.showValidationWorking = function (name) {
-			var input = this._parameters.values[name];
-			if (input.validation_working) {
-				self.options('validationWorkingShow')(input.validation_working);
+			var validation_working = $(this._parameters.element).find(getByOuterElement(this.options('validationWorkingElement'), name)).first();
+			if (validation_working) {
+				this.options('validationWorkingShow')(validation_working);
 			}
 		};
 		this.hideValidationWorking = function (name) {
-			var input = this._parameters.values[name];
-			if (input.validation_working) {
-				self.options('validationWorkingHide')(input.validation_working);
+			var validation_working = $(this._parameters.element).find(getByOuterElement(this.options('validationWorkingElement'), name)).first();
+			if (validation_working) {
+				this.options('validationWorkingHide')(validation_working);
 			}
 		};
 
@@ -594,6 +596,7 @@ https://github.com/fra-iesus/tdp
 									option.attr("disabled");
 								}
 								if (input.value == setting[1]) {
+									input_element.selectedIndex = -1;
 									option.attr("selected");
 								}
 								input_element.append(option);
@@ -673,11 +676,7 @@ https://github.com/fra-iesus/tdp
 					if (!$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 					}
-					input.validation_working = $el.find(getByOuterElement(self.options('validationWorkingElement'), key)).first();
 				}
-				input.validation_msg = $el.find(getByOuterElement(self.options('validationMessageElement'), key)).first();
-				input.validation_msg_el = $el.find(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first();
-				input.validation_ok = $el.find(outerElement(self.options('validationOkElement')) + '[name="' + key + '"]').first();
 				self.hideValidationOk(key);
 				self.hideValidationMsg(key);
 				self.hideValidationWorking(key);
@@ -778,9 +777,15 @@ https://github.com/fra-iesus/tdp
 				type: 'POST',
 				data: JSON.stringify(submitData),
 				dataType: 'json',
-				timeout: 30000,
+				timeout: self.options('submitTimeout'),
 				cache: false,
 				success: function(data) {
+					if (self._parameters.displayElement || self._parameters.editLink) {
+						$(self._parameters.element).hide(self.options('animationFastSpeed'));
+						if (self._parameters.editLink) {
+							$(self._parameters.editLink).show();
+						}
+					}
 					self.options('submitHandlers').success(data, self, submitData);
 				},
 				error: function(data) {
