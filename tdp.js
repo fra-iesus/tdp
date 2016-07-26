@@ -777,7 +777,7 @@ https://github.com/fra-iesus/tdp
 			}
 
 			if (self.options('beforeSubmit')) {
-				self.options('beforeSubmit')();
+				self.options('beforeSubmit')(self);
 			}
 			// show working animation
 			if (self.options('submitLoadingElement')) {
