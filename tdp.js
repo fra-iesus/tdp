@@ -681,19 +681,20 @@ https://github.com/fra-iesus/tdp
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (input.type !== 'hidden') {
-					if (self.validators_to_go > 0) {
-						all_ok = false;
-					} else if (!input.validated || input.revalidate) {
-						all_ok = false;
+					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
 						if (!partial || input.validated === null || input.revalidate) {
 							self.validate(key, skip_validators);
 						}
+						var prev_validators = self.validators_to_go;
 						if (input.validated === false) {
-							topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
-							setTimeout( function() {
-								self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-							}, self.options('validationMessageFlashDelay')*i++);
+							all_ok = false;
+							if (self.validators_to_go === prev_validators) {
+								topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
+								setTimeout( function() {
+									self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+								}, self.options('validationMessageFlashDelay')*i++);
+							}
 						}
 					}
 				}
@@ -712,7 +713,7 @@ https://github.com/fra-iesus/tdp
 		// submit form
 		this.submitForm = function(ev) {
 			if (!self.revalidateAll(true)) {
-				if (self.validators_to_go) {
+				if (self.validators_to_go > 0) {
 					if (self.options('submitMethod') !== null) {
 						self.after_validators = function() {
 							return self.options('submitMethod')(self);
