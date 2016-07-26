@@ -766,16 +766,6 @@ https://github.com/fra-iesus/tdp
 				return;
 			}
 
-			function updateValue(key, val) {
-				var el = $(self._parameters.displayElement).find('span.value[name="' + key + '"]').first();
-				if (el.length) {
-					el.html(val);
-				}
-				if (self._parameters.values[key].type === 'password') {
-					$(self._parameters.element).find('input[name="' + key + '"]').val('');
-				}
-			}
-
 			if (self.options('beforeSubmit')) {
 				self.options('beforeSubmit')(self);
 			}
