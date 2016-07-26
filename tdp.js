@@ -791,13 +791,13 @@ https://github.com/fra-iesus/tdp
 				timeout: 30000,
 				cache: false,
 				success: function(data) {
-					$self.options('submitHandlers').success(data, self);
+					$self.options('submitHandlers').success(data, self, submitData);
 				},
 				error: function(data) {
-					$self.options('submitHandlers').error(data, self);
+					$self.options('submitHandlers').error(data, self, submitData);
 				},
 				always: function(data) {
-					$self.options('submitHandlers').always(data, self);
+					$self.options('submitHandlers').always(data, self, submitData);
 				},
 				async: true
 			});
