@@ -68,7 +68,7 @@ https://github.com/fra-iesus/tdp
 				},
 				error: function(data) {
 				},
-				always: function(data) {
+				always: function() {
 					if (self.options('submitLoadingElement')) {
 						self.options('submitLoadingElement').hide();
 					}
@@ -796,10 +796,9 @@ https://github.com/fra-iesus/tdp
 				error: function(data) {
 					self.options('submitHandlers').error(data, self, submitData);
 				},
-				always: function(data) {
-					self.options('submitHandlers').always(data, self, submitData);
-				},
 				async: true
+			}).always(function () {
+				self.options('submitHandlers').always(self, submitData);
 			});
 		};
 
