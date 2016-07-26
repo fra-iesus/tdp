@@ -57,8 +57,23 @@ https://github.com/fra-iesus/tdp
 				}
 				return false;
 			},
-			submitMethod: null, // directly submit form
+			submitMethod: null, // use built-in submit method
+			submitTimeout: 5000,
+			submitUrl: null,
+			submitLoadingElement: null,
+			beforeSubmit: null,
 			submitElement: 'input[type="submit"]',
+			submitHandlers: {
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				always: function(data) {
+					if (self.options('submitLoadingElement')) {
+						self.options('submitLoadingElement').hide();
+					}
+				}
+			},
 			verbose: false,
 			logger: null
 		};
@@ -710,29 +725,111 @@ https://github.com/fra-iesus/tdp
 			return true;
 		};
 
+		this.ajaxSubmit = function() {
+			var self = this;
+			var submitData = {};
+			var updateNeeded = false;
+			Object.keys(self._parameters.values).forEach(function(key) {
+				var value;
+				var changed = false;
+				if (self._parameters.values[key].type === 'hidden') {
+					value = self._parameters.values[key].value;
+					changed = true;
+				} else if (!self._parameters.values[key].match) {
+					value = self.getValue(key);
+					if (typeof value === 'string') {
+						value = value.trim();
+					}
+					changed = (value != self._parameters.values[key].value && ( (value !== null && value !== '') || (self._parameters.values[key].value !== null && self._parameters.values[key].value !== '') ) );
+					if (changed) {
+						updateNeeded = true;
+					}
+				}
+				if (changed) {
+					if (self._parameters.values[key].prefix) {
+						if (!(self._parameters.values[key].prefix in submitData)) {
+							submitData[self._parameters.values[key].prefix] = {};
+						}
+						submitData[self._parameters.values[key].prefix][key] = value;
+					} else {
+						submitData[key] = value;
+					}
+				}
+			});
+			if ( !updateNeeded && (!self._parameters.alwaysSubmit || !submitData.length) ) {
+				if (self._parameters.displayElement) {
+					$(self._parameters.element).hide(self.options('animationFastSpeed'));
+					if (self._parameters.editLink) {
+						$(self._parameters.editLink).show();
+					}
+				}
+				return;
+			}
+
+			function updateValue(key, val) {
+				var el = $(self._parameters.displayElement).find('span.value[name="' + key + '"]').first();
+				if (el.length) {
+					el.html(val);
+				}
+				if (self._parameters.values[key].type === 'password') {
+					$(self._parameters.element).find('input[name="' + key + '"]').val('');
+				}
+			}
+
+			if (self.options('beforeSubmit')) {
+				self.options('beforeSubmit')();
+			}
+			// show working animation
+			if (self.options('submitLoadingElement')) {
+				$(self.options('submitLoadingElement')).show();
+			}
+			var request = $.ajax({
+				url: self.options('submitUrl'),
+				type: 'POST',
+				data: JSON.stringify(submitData),
+				dataType: 'json',
+				timeout: 30000,
+				cache: false,
+				success: function(data) {
+					$self.options('submitHandlers').success(data, self);
+				},
+				error: function(data) {
+					$self.options('submitHandlers').error(data, self);
+				},
+				always: function(data) {
+					$self.options('submitHandlers').always(data, self);
+				},
+				async: true
+			});
+		};
+
+
 		// submit form
 		this.submitForm = function(ev) {
 			if (!self.revalidateAll(true)) {
 				if (self.validators_to_go > 0) {
-					if (self.options('submitMethod') !== null) {
-						self.after_validators = function() {
+					self.after_validators = function() {
+						if (self.options('submitMethod') !== null) {
 							return self.options('submitMethod')(self);
-						};
-					}
+						} else {
+							return self.ajaxSubmit();
+						}
+					};
 				}
 				if (ev !== null && typeof ev === 'object') {
 					ev.preventDefault();
 				}
 				return false;
+			}
+			if (ev !== null && typeof ev === 'object') {
+				ev.preventDefault();
 			}
 			if (self.options('submitMethod') !== null) {
-				if (ev !== null && typeof ev === 'object') {
-					ev.preventDefault();
-				}
-				self.options('submitMethod')(self);
-				return false;
+				return self.options('submitMethod')(self);
+			} else {
+				return self.ajaxSubmit();
 			}
-			return true;
+			return false;
 		};
 
 		if ($el.is('form')) {
