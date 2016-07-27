@@ -697,17 +697,19 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
-						if (!partial || input.validated === null || input.revalidate) {
-							self.validate(key, skip_validators);
-						}
-						var prev_validators = self.validators_to_go;
-						if (input.validated === false) {
-							all_ok = false;
-							if (self.validators_to_go === prev_validators) {
-								topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
-								setTimeout( function() {
-									self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-								}, self.options('validationMessageFlashDelay')*i++);
+						if (self.getInput(key).is(":visible")) {
+							if (!partial || input.validated === null || input.revalidate) {
+								self.validate(key, skip_validators);
+							}
+							var prev_validators = self.validators_to_go;
+							if (input.validated === false) {
+								all_ok = false;
+								if (self.validators_to_go === prev_validators) {
+									topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
+									setTimeout( function() {
+										self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+									}, self.options('validationMessageFlashDelay')*i++);
+								}
 							}
 						}
 					}
@@ -755,6 +757,7 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
+
 			if ( !updateNeeded && (!self._parameters.alwaysSubmit || !Object.keys(submitData).length) ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
