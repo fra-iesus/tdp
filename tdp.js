@@ -755,7 +755,7 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
-			if ( !updateNeeded && (!self._parameters.alwaysSubmit || !submitData.length) ) {
+			if ( !updateNeeded && (!self._parameters.alwaysSubmit || !Object.keys(submitData).length) ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
 					if (self._parameters.editLink) {
@@ -764,7 +764,6 @@ https://github.com/fra-iesus/tdp
 				}
 				return;
 			}
-
 			if (self.options('beforeSubmit')) {
 				self.options('beforeSubmit')(self);
 			}
