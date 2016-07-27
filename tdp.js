@@ -78,8 +78,20 @@ https://github.com/fra-iesus/tdp
 			logger: null
 		};
 
+		if (!parameters || typeof(parameters) !== 'object') {
+			if (options && typeof(options) === 'object') {
+				parameters = options;
+				options = {};
+			} else {
+				return console.warn('$.TdpPlugin constructor called without mandatory parameters');
+			}
+		}
+		if (!options || typeof(options) !== 'object') {
+			options = {};
+		}
+
 		this._options = $.extend( true, {}, this._defaults, options );
-		this._parameters = parameters;
+		this._parameters = $.extend( true, {}, parameters);
 		this._parameters.element = $el;
 		this.validators_to_go = 0;
 		this.after_validators = null;
@@ -94,18 +106,6 @@ https://github.com/fra-iesus/tdp
 			}
 			return this._options;
 		};
-
-		if (!parameters || typeof(parameters) !== 'object') {
-			if (options && typeof(options) === 'object') {
-				parameters = options;
-				options = {};
-			} else {
-				return console.log('$.TdpPlugin constructor called without mandatory parameters');
-			}
-		}
-		if (!options || typeof(options) !== 'object') {
-			options = {};
-		}
 
 		if (this.options('logger') && $(this.options('logger')).length) {
 			this._log = $(this.options('logger'));
