@@ -70,7 +70,7 @@ https://github.com/fra-iesus/tdp
 				},
 				always: function() {
 					if (self.options('submitLoadingElement')) {
-						self.options('submitLoadingElement').hide();
+						$(self.options('submitLoadingElement')).hide();
 					}
 				}
 			},
