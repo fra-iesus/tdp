@@ -733,17 +733,22 @@ https://github.com/fra-iesus/tdp
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var value;
 				var changed = false;
-				if (self._parameters.values[key].type === 'hidden') {
-					value = self._parameters.values[key].value;
+				if ($self._parameters.alwaysSubmit) {
 					changed = true;
-				} else if (!self._parameters.values[key].match) {
-					value = self.getValue(key);
-					if (typeof value === 'string') {
-						value = value.trim();
-					}
-					changed = (value != self._parameters.values[key].value && ( (value !== null && value !== '') || (self._parameters.values[key].value !== null && self._parameters.values[key].value !== '') ) );
-					if (changed) {
-						updateNeeded = true;
+					updateNeeded = true;
+				} else {
+					if (self._parameters.values[key].type === 'hidden') {
+						value = self._parameters.values[key].value;
+						changed = true;
+					} else if (!self._parameters.values[key].match) {
+						value = self.getValue(key);
+						if (typeof value === 'string') {
+							value = value.trim();
+						}
+						changed = (value != self._parameters.values[key].value && ( (value !== null && value !== '') || (self._parameters.values[key].value !== null && self._parameters.values[key].value !== '') ) );
+						if (changed) {
+							updateNeeded = true;
+						}
 					}
 				}
 				if (changed) {
@@ -758,7 +763,7 @@ https://github.com/fra-iesus/tdp
 				}
 			});
 
-			if ( !updateNeeded && (!self._parameters.alwaysSubmit || !Object.keys(submitData).length) ) {
+			if ( !updateNeeded && !Object.keys(submitData).length ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
 					if (self._parameters.editLink) {
