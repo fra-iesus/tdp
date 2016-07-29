@@ -284,9 +284,6 @@ https://github.com/fra-iesus/tdp
 					var results = [];
 					var later = false;
 					var skipped = false;
-					if (skip_validators) {
-						skipped = true;
-					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
 						self.hideValidationOk(name);
 						if (definition.empty) {
@@ -308,7 +305,8 @@ https://github.com/fra-iesus/tdp
 						return true;
 					}
 					definition.conditions.some(function(entry) {
-						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
+						if (skip_validators && entry.type === 'validator' && $.inArray(entry.type, skip_validators) > -1) {
+							skipped = true;
 							return false;
 						}
 						var result = true;
@@ -478,7 +476,11 @@ https://github.com/fra-iesus/tdp
 								console.warn('Unknown condition type "' + entry.type + '"');
 						}
 						if (!result) {
-							results.push(entry.message);
+							if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
+								skipped = true;
+							} else {
+								results.push(entry.message);
+							}
 							if (entry.last) {
 								return true;
 							}
@@ -628,7 +630,7 @@ https://github.com/fra-iesus/tdp
 						self.setValue(key, input.value);
 					}
 					input_element.on('input', function() {
-						self.validate(key, ['validator', 'min', 'not', 'match']);
+						self.validate(key, ['validator', 'min', 'not', 'match', 'regular']);
 					});
 					input_element.on('change, blur', function() {
 						self.validate(key);
