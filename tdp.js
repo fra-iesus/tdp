@@ -431,7 +431,7 @@ https://github.com/fra-iesus/tdp
 										type: 'POST',
 										data: JSON.stringify( self.options('validatorRequestProcessor')(value, entry.params) ),
 										dataType: 'json',
-										timeout: 5000,
+										timeout: self.options('submitTimeout'),
 										cache: false,
 										success: function(data) {
 											var message = self.options('validatorResponseProcessor')(data);
