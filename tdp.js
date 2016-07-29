@@ -172,9 +172,9 @@ https://github.com/fra-iesus/tdp
 		this.setValue = function (name, value) {
 			if (this._parameters.values[name].type === 'radio') {
 				if (value) {
-					return $(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').prop( "checked", true );
+					$(this._parameters.element).find('input:radio[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
 				} else {
-					return $(this._parameters.element).find('input[name="' + name + '"]').prop( "checked", false );
+					return $(this._parameters.element).find('input:radio[name="' + name + '"]').first().prop( "checked", false );
 				}
 			}
 			var input = this.getInput(name);
@@ -578,8 +578,8 @@ https://github.com/fra-iesus/tdp
 			}
 			input.match = match;
 			input.revalidate = revalidate;
-			$el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]').each(function() {
-				input_element = $(this);
+			if (input.type !== 'hidden') {
+				input_element = $el.find('input[name="' + key + '"],textarea[name="' + key + '"],select[name="' + key + '"]');
 				if (input.type === 'select') {
 					if (input.interval || input.values) {
 						// for select set allowed values if defined
@@ -618,14 +618,14 @@ https://github.com/fra-iesus/tdp
 				}
 				if (input.type === 'radio') {
 					if (input.value) {
-						input_element.filter('[value="' + input.value + '"]').prop( "checked", true );
+						self.setValue(key, input.value);
 					}
 					input_element.on('click', function() {
 						self.validate(key);
 					});
 				} else {
 					if (input.value) {
-						input_element.val(input.value);
+						self.setValue(key, input.value);
 					}
 					input_element.on('input', function() {
 						self.validate(key, ['validator', 'min', 'not', 'match']);
@@ -684,7 +684,7 @@ https://github.com/fra-iesus/tdp
 				if (input.value && self.options('prevalidation')) {
 					self.validate(key);
 				}
-			});
+			}
 		});
 
 		this.revalidateAll = function(partial, skip_validators) {
