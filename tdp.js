@@ -697,7 +697,7 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
-						if (self.getInput(key).is(":visible")) {
+						if (self.getInput(key).parent().is(":visible")) {
 							if (!partial || input.validated === null || input.revalidate) {
 								self.validate(key, skip_validators);
 							}
