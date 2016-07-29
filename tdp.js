@@ -793,17 +793,22 @@ https://github.com/fra-iesus/tdp
 							$(self._parameters.editLink).show();
 						}
 					}
-					self.options('submitHandlers').success(data, self, submitData);
+					if (typeof self.options('submitHandlers').success === "function") {
+						self.options('submitHandlers').success(data, self, submitData);
+					}
 				},
 				error: function(data) {
-					self.options('submitHandlers').error(data, self, submitData);
+					if (typeof self.options('submitHandlers').error === "function") {
+						self.options('submitHandlers').error(data, self, submitData);
+					}
 				},
 				async: true
 			}).always(function () {
-				self.options('submitHandlers').always(self, submitData);
+				if (typeof self.options('submitHandlers').always === "function") {
+					self.options('submitHandlers').always(self, submitData);
+				}
 			});
 		};
-
 
 		// submit form
 		this.submitForm = function(ev) {
