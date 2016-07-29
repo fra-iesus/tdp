@@ -733,7 +733,7 @@ https://github.com/fra-iesus/tdp
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var value;
 				var changed = false;
-				if ($self._parameters.alwaysSubmit) {
+				if (self._parameters.alwaysSubmit) {
 					changed = true;
 					updateNeeded = true;
 				} else {
