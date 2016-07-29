@@ -74,6 +74,7 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			},
+			skipOnInput: ['validator', 'min', 'not', 'match'],
 			verbose: false,
 			logger: null
 		};
@@ -284,6 +285,9 @@ https://github.com/fra-iesus/tdp
 					var results = [];
 					var later = false;
 					var skipped = false;
+					if (skip_validators) {
+						skipped = true;
+					}
 					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
 						self.hideValidationOk(name);
 						if (definition.empty) {
@@ -305,8 +309,7 @@ https://github.com/fra-iesus/tdp
 						return true;
 					}
 					definition.conditions.some(function(entry) {
-						if (skip_validators && entry.type === 'validator' && $.inArray(entry.type, skip_validators) > -1) {
-							skipped = true;
+						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
 							return false;
 						}
 						var result = true;
@@ -476,11 +479,7 @@ https://github.com/fra-iesus/tdp
 								console.warn('Unknown condition type "' + entry.type + '"');
 						}
 						if (!result) {
-							if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
-								skipped = true;
-							} else {
-								results.push(entry.message);
-							}
+							results.push(entry.message);
 							if (entry.last) {
 								return true;
 							}
@@ -630,7 +629,7 @@ https://github.com/fra-iesus/tdp
 						self.setValue(key, input.value);
 					}
 					input_element.on('input', function() {
-						self.validate(key, ['validator', 'min', 'not', 'match', 'regular']);
+						self.validate(key, self.options('skipOnInput'));
 					});
 					input_element.on('change, blur', function() {
 						self.validate(key);
@@ -699,7 +698,7 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
-						if (self.getInput(key).parent().is(":visible")) {
+						if (self.getInput(key).is(":visible")) {
 							if (!partial || input.validated === null || input.revalidate) {
 								self.validate(key, skip_validators);
 							}
