@@ -13,6 +13,7 @@ https://github.com/fra-iesus/tdp
 			animationFastSpeed: 'fast',
 			errorMessageEmptyInput: 'Field is mandatory',
 			scrollToErrorDuration: 2000,
+			scrollToErrorEnabled: true,
 			dialogShowDuration: 500,
 			dialogCloseDuration: 500,
 			dialogAutoclose: false,
@@ -717,7 +718,7 @@ https://github.com/fra-iesus/tdp
 				}
 			});
 			if (!all_ok) {
-				if (topElement) {
+				if (topElement && self.options('scrollToErrorEnabled')) {
 					$('html, body').animate({
 						scrollTop: topElement
 					}, self.options('scrollToErrorDuration'));
