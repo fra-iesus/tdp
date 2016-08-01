@@ -765,22 +765,24 @@ https://github.com/fra-iesus/tdp
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var value;
 				var changed = false;
-				if (self._parameters.alwaysSubmit) {
+				if (self._parameters.values[key].type === 'hidden') {
+					value = self._parameters.values[key].value;
 					changed = true;
-					updateNeeded = true;
-				} else {
-					if (self._parameters.values[key].type === 'hidden') {
-						value = self._parameters.values[key].value;
+					if (self._parameters.alwaysSubmit) {
+						updateNeeded = true;
+					}
+				} else if (!self._parameters.values[key].match) {
+					value = self.getValue(key);
+					if (typeof value === 'string') {
+						value = value.trim();
+					}
+					if (self._parameters.alwaysSubmit) {
 						changed = true;
-					} else if (!self._parameters.values[key].match) {
-						value = self.getValue(key);
-						if (typeof value === 'string') {
-							value = value.trim();
-						}
+					} else {
 						changed = (value != self._parameters.values[key].value && ( (value !== null && value !== '') || (self._parameters.values[key].value !== null && self._parameters.values[key].value !== '') ) );
-						if (changed) {
-							updateNeeded = true;
-						}
+					}
+					if (changed) {
+						updateNeeded = true;
 					}
 				}
 				if (changed) {
@@ -794,7 +796,6 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
-
 			if ( !updateNeeded && !Object.keys(submitData).length ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
