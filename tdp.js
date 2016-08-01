@@ -699,7 +699,7 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
-						if (self.getInput(key).is(":visible")) {
+						if (self.getInput(key).parent().is(":visible")) {
 							if (!partial || input.validated === null || input.revalidate) {
 								self.validate(key, skip_validators);
 							}
@@ -840,8 +840,9 @@ https://github.com/fra-iesus/tdp
 			return false;
 		};
 
-		if ($el.is('form')) {
-			$el.submit(function(ev){
+		if ($el.is('form') || $el.find('form').length) {
+			var form = $el.is('form') ? $el : $el.find('form').first();
+			form.bind('submit', function(ev){
 				self.submitForm(ev);
 				return false;
 			});
