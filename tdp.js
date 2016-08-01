@@ -138,13 +138,10 @@ https://github.com/fra-iesus/tdp
 
 		function firstElement(element, pos) {
 			var element_position;
-			console.log('finding element position');
 			if (element.is(':visible')) {
 				element_position = element.offset().top;
-				console.log('element is visible. setting offset to ' + element_position);
 			} else {
 				element_position = element.parent().offset().top;
-				console.log('element is not visible. setting offset to parents ' + element_position);
 			}
 			return (pos === null) ? element_position : Math.min(pos, element_position);
 		}
