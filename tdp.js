@@ -799,7 +799,7 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
-			if ( !updateNeeded && !Object.keys(submitData).length ) {
+			if ( !updateNeeded ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
 					if (self._parameters.editLink) {
