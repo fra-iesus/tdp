@@ -136,6 +136,19 @@ https://github.com/fra-iesus/tdp
 			return els.join(' ');
 		}
 
+		function firstElement(element, pos) {
+			var element_position;
+			console.log('finding element position');
+			if (element.is(':visible')) {
+				element_position = element.offset().top;
+				console.log('element is visible. setting offset to ' + element_position);
+			} else {
+				element_position = element.parent().offset().top;
+				console.log('element is not visible. setting offset to parents ' + element_position);
+			}
+			return (pos === null) ? element_position : Math.min(pos, element_position);
+		}
+
 		//get input element
 		this.getInput = function (name) {
 			if (!this._parameters.values[name]) {
@@ -456,6 +469,14 @@ https://github.com/fra-iesus/tdp
 												definition.validated = false;
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
+													self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												}
+												if (!self.validators_to_go) {
+													if (self.options('scrollToErrorEnabled')) {
+														$('html, body').animate({
+															scrollTop: self.first_unvalidated
+														}, self.options('scrollToErrorDuration'));
+													}
 												}
 												self.after_validators = null;
 												self.showValidationMsg(name, result);
@@ -465,6 +486,14 @@ https://github.com/fra-iesus/tdp
 												definition.validated = false;
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
+													self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												}
+												if (!self.validators_to_go) {
+													if (self.options('scrollToErrorEnabled')) {
+														$('html, body').animate({
+															scrollTop: self.first_unvalidated
+														}, self.options('scrollToErrorDuration'));
+													}
 												}
 												self.after_validators = null;
 												result = self.options('validationMessageProcessor')([entry.message]);
@@ -699,7 +728,7 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
-						if (self.getInput(key).parent().is(":visible")) {
+						if (element.parent().is(":visible")) {
 							if (!partial || input.validated === null || input.revalidate) {
 								self.validate(key, skip_validators);
 							}
@@ -707,13 +736,7 @@ https://github.com/fra-iesus/tdp
 							if (input.validated === false) {
 								all_ok = false;
 								if (self.validators_to_go === prev_validators) {
-									var element_position;
-									if (element.is(':visible')) {
-										element_position = element.offset().top;
-									} else {
-										element_position = element.parent().offset().top;
-									}
-									topElement = (topElement === null) ? element_position : Math.min(topElement, element_position);
+									topElement = firstElement(element, topElement);
 									setTimeout( function() {
 										self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 									}, self.options('validationMessageFlashDelay')*i++);
@@ -725,9 +748,13 @@ https://github.com/fra-iesus/tdp
 			});
 			if (!all_ok) {
 				if (topElement && self.options('scrollToErrorEnabled')) {
-					$('html, body').animate({
-						scrollTop: topElement
-					}, self.options('scrollToErrorDuration'));
+					if (!self.validators_to_go) {
+						$('html, body').animate({
+							scrollTop: topElement
+						}, self.options('scrollToErrorDuration'));
+					} else {
+						self.first_unvalidated = topElement;
+					}
 				}
 				return false;
 			}
