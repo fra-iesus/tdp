@@ -707,7 +707,13 @@ https://github.com/fra-iesus/tdp
 							if (input.validated === false) {
 								all_ok = false;
 								if (self.validators_to_go === prev_validators) {
-									topElement = (topElement === null) ? element.offset().top : Math.min(topElement, element.offset().top);
+									var element_position;
+									if (element.is(':visible')) {
+										element_position = element.offset().top;
+									} else {
+										element_position = element.parent().offset().top;
+									}
+									topElement = (topElement === null) ? element_position : Math.min(topElement, element_position);
 									setTimeout( function() {
 										self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 									}, self.options('validationMessageFlashDelay')*i++);
