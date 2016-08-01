@@ -168,6 +168,9 @@ https://github.com/fra-iesus/tdp
 
 		//get value from input name
 		this.getValue = function (name) {
+			if (this._parameters.values[name].type === 'hidden') {
+				return this._parameters.values[name].value;
+			}
 			var element = this.getInput(name);
 			if (element) {
 				if (element.attr('type') === 'radio') {
