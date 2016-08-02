@@ -186,7 +186,7 @@ https://github.com/fra-iesus/tdp
 		//set value to input by input name
 		this.setValue = function (name, value) {
 			var input = this.getInput(name);
-			if (element.attr('type') === 'radio' || element.attr('type') === 'checkbox') {
+			if (input.attr('type') === 'radio' || input.attr('type') === 'checkbox') {
 				if (value) {
 					$(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
 				} else {
