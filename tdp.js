@@ -279,6 +279,9 @@ https://github.com/fra-iesus/tdp
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
 					var value = self.getValue(name);
+					if (typeof value === 'string') {
+						value = value.trim();
+					}
 					var definition = self._parameters.values[name];
 					if (definition.old_value !== null && value === definition.old_value) {
 						if (definition.match) {
@@ -302,7 +305,7 @@ https://github.com/fra-iesus/tdp
 					if (skip_validators) {
 						skipped = true;
 					}
-					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value.trim() === '')) {
+					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
 						self.hideValidationOk(name);
 						if (definition.empty) {
 							self.hideValidationMsg(name);
