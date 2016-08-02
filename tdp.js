@@ -774,7 +774,7 @@ https://github.com/fra-iesus/tdp
 					if (self._parameters.alwaysSubmit) {
 						updateNeeded = true;
 					}
-				} else if (!self._parameters.values[key].match) {
+				} else if ( !self._parameters.values[key].match && (self.getInput(key).parent().is(":visible")) ) {
 					value = self.getValue(key);
 					if (typeof value === 'string') {
 						value = value.trim();
@@ -782,7 +782,7 @@ https://github.com/fra-iesus/tdp
 					if (self._parameters.alwaysSubmit) {
 						changed = true;
 					} else {
-						changed = (value != self._parameters.values[key].value && ( (value !== null && value !== '') || (self._parameters.values[key].value !== null && self._parameters.values[key].value !== '') ) );
+						changed = (value != self._parameters.values[key].value && ( (value != null && value != '') || (self._parameters.values[key].value != null && self._parameters.values[key].value != '') ) );
 					}
 					if (changed) {
 						updateNeeded = true;
