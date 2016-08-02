@@ -463,6 +463,7 @@ https://github.com/fra-iesus/tdp
 													self.validators_to_go--;
 													if (self.validators_to_go === 0 && self.after_validators !== null) {
 														self.after_validators();
+														self.after_calidators = null;
 													}
 												}
 											} else {
