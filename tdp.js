@@ -278,11 +278,14 @@ https://github.com/fra-iesus/tdp
 				var self = this;
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
+					var definition = self._parameters.values[name];
 					var value = self.getValue(name);
 					if (typeof value === 'string') {
 						value = value.trim();
+						if (definition.type === 'tel') {
+							value = value.replace(/ |-/g, '');
+						}
 					}
-					var definition = self._parameters.values[name];
 					if (definition.old_value !== null && value === definition.old_value) {
 						if (definition.match) {
 							if (self.getValue(definition.match) == value) {
@@ -784,6 +787,9 @@ https://github.com/fra-iesus/tdp
 					value = self.getValue(key);
 					if (typeof value === 'string') {
 						value = value.trim();
+						if (self._parameters.values[key].type === 'tel') {
+							value = value.replace(/ |-/g, '');
+						}
 					}
 					if (self._parameters.alwaysSubmit) {
 						changed = true;
