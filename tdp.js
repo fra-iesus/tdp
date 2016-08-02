@@ -308,7 +308,7 @@ https://github.com/fra-iesus/tdp
 					if (skip_validators) {
 						skipped = true;
 					}
-					if ( Number.isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
+					if ( isNaN(value) || (value === undefined) || (value == null) || (value === '')) {
 						self.hideValidationOk(name);
 						if (definition.empty) {
 							self.hideValidationMsg(name);
@@ -377,16 +377,16 @@ https://github.com/fra-iesus/tdp
 								result = (t1 !== t2);
 								break;
 							case 'notNaN':
-								result = !Number.isNaN(t1) && (t1 !== undefined);
+								result = !isNaN(t1) && (t1 !== undefined);
 								break;
 							case 'valid':
 								result = t1 == value;
 								break;
 							case 'min':
-								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 >= t2;
+								result = !isNaN(t1) && (t1 !== undefined) && t1 >= t2;
 								break;
 							case 'max':
-								result = !Number.isNaN(t1) && (t1 !== undefined) && t1 <= t2;
+								result = !isNaN(t1) && (t1 !== undefined) && t1 <= t2;
 								break;
 							case 'match':
 								result = value == self.getValue(entry.value);
