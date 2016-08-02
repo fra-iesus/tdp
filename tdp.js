@@ -143,7 +143,7 @@ https://github.com/fra-iesus/tdp
 			} else {
 				element_position = element.parent().offset().top;
 			}
-			return (pos === null) ? element_position : Math.min(pos, element_position);
+			return ( !pos && pos !== 0 ? element_position : Math.min(pos, element_position) );
 		}
 
 		//get input element
@@ -471,6 +471,8 @@ https://github.com/fra-iesus/tdp
 												}
 											} else {
 												definition.validated = false;
+												self.showValidationMsg(name, result);
+												self.hideValidationOk(name);
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
 													self.first_unvalidated = firstElement($input, self.first_unvalidated);
@@ -483,11 +485,13 @@ https://github.com/fra-iesus/tdp
 													}
 												}
 												self.after_validators = null;
-												self.showValidationMsg(name, result);
 											}
 										},
 										error: function(data) {
 												definition.validated = false;
+												result = self.options('validationMessageProcessor')([entry.message]);
+												self.showValidationMsg(name, result);
+												self.hideValidationOk(name);
 												if (self.validators_to_go > 0) {
 													self.validators_to_go--;
 													self.first_unvalidated = firstElement($input, self.first_unvalidated);
@@ -500,8 +504,6 @@ https://github.com/fra-iesus/tdp
 													}
 												}
 												self.after_validators = null;
-												result = self.options('validationMessageProcessor')([entry.message]);
-												self.showValidationMsg(name, result);
 										},
 										async: true
 									}).always(function () {
