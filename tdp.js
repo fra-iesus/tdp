@@ -173,7 +173,7 @@ https://github.com/fra-iesus/tdp
 			}
 			var element = this.getInput(name);
 			if (element) {
-				if (element.attr('type') === 'radio') {
+				if (element.attr('type') === 'radio' || element.attr('type') === 'checkbox') {
 					if (!element.prop("checked")) {
 						return '';
 					}
@@ -185,14 +185,14 @@ https://github.com/fra-iesus/tdp
 
 		//set value to input by input name
 		this.setValue = function (name, value) {
-			if (this._parameters.values[name].type === 'radio') {
+			var input = this.getInput(name);
+			if (element.attr('type') === 'radio' || element.attr('type') === 'checkbox') {
 				if (value) {
-					$(this._parameters.element).find('input:radio[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
+					$(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
 				} else {
-					return $(this._parameters.element).find('input:radio[name="' + name + '"]').first().prop( "checked", false );
+					return $(this._parameters.element).find('input[name="' + name + '"]').first().prop( "checked", false );
 				}
 			}
-			var input = this.getInput(name);
 			if (!input.length) {
 				console.warn('Element for input "' + name + '" does not exist');
 				return false;
