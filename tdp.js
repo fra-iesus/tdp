@@ -269,6 +269,7 @@ https://github.com/fra-iesus/tdp
 				if (input.type !== 'hidden') {
 					input.validated = null;
 					input.old_value = null;
+					input.in_progress = false;
 					self.setValue(key, input.value);
 					self.hideValidationMsg(key);
 					self.hideValidationOk(key);
@@ -277,6 +278,8 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
+			self.after_validators = null;
+			self.validators_to_go = 0;
 		};
 
 		// validate input
