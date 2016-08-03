@@ -481,11 +481,8 @@ https://github.com/fra-iesus/tdp
 												result = self.options('validationMessageProcessor')([message]);
 											} else {
 												result = message ? entry.message : false;
-												if (!result && definition.partial_error) {
-													result = true;
-												}
 											}
-											if (!result) {
+											if (!result && !definition.partial_error) {
 												definition.validated = true;
 												self.showValidationOk(name);
 												self.validators_to_go--;
@@ -537,10 +534,10 @@ https://github.com/fra-iesus/tdp
 							default:
 								console.warn('Unknown condition type "' + entry.type + '"');
 						}
-						if (!later && !result) {
-							definition.partial_error = true;
-						}
 						if (!result) {
+							if (!later) {
+								definition.partial_error = true;
+							}
 							results.push(entry.message);
 							if (entry.last) {
 								return true;
