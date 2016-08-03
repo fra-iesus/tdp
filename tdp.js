@@ -268,6 +268,7 @@ https://github.com/fra-iesus/tdp
 				var input = self._parameters.values[key];
 				if (input.type !== 'hidden') {
 					input.validated = null;
+					input.partial_error = false;
 					input.old_value = null;
 					input.in_progress = false;
 					self.setValue(key, input.value);
@@ -345,6 +346,7 @@ https://github.com/fra-iesus/tdp
 						}
 						return true;
 					}
+					definition.partial_error = false;
 					definition.conditions.some(function(entry) {
 						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
 							return false;
@@ -479,6 +481,9 @@ https://github.com/fra-iesus/tdp
 												result = self.options('validationMessageProcessor')([message]);
 											} else {
 												result = message ? entry.message : false;
+												if (!result && definition.partial_error) {
+													result = true;
+												}
 											}
 											if (!result) {
 												definition.validated = true;
@@ -490,7 +495,9 @@ https://github.com/fra-iesus/tdp
 												}
 											} else {
 												definition.validated = false;
-												self.showValidationMsg(name, result);
+												if (typeof result === 'string') {
+													self.showValidationMsg(name, result);
+												}
 												self.hideValidationOk(name);
 												self.validators_to_go--;
 												self.first_unvalidated = firstElement($input, self.first_unvalidated);
@@ -529,6 +536,9 @@ https://github.com/fra-iesus/tdp
 								break;
 							default:
 								console.warn('Unknown condition type "' + entry.type + '"');
+						}
+						if (!later && !result) {
+							definition.partial_error = true;
 						}
 						if (!result) {
 							results.push(entry.message);
