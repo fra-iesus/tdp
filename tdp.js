@@ -297,7 +297,7 @@ https://github.com/fra-iesus/tdp
 					if (typeof value === 'string') {
 						value = value.trim();
 						if (definition.type === 'tel') {
-							value = value.replace(/ |-/g, '');
+							value = value.replace(/[ -]/g, '');
 						}
 					}
 					if (definition.old_value !== null && value === definition.old_value) {
@@ -748,18 +748,22 @@ https://github.com/fra-iesus/tdp
 					if (!input.validated || input.revalidate) {
 						var element = self.getInput(key);
 						if (element.parent().is(":visible")) {
-							var prev_validators = self.validators_to_go;
-							if ((!partial || input.validated === null || input.revalidate) && !input.in_progress) {
-								self.validate(key, skip_validators);
-							}
-							if (input.validated === false && !input.in_progress) {
+							if (input.in_progress) {
 								all_ok = false;
-								if (self.validators_to_go === prev_validators) {
-									self.after_validators = null;
-									topElement = firstElement(element, topElement);
-									setTimeout( function() {
-										self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
-									}, self.options('validationMessageFlashDelay')*i++);
+							} else {
+								var prev_validators = self.validators_to_go;
+								if ((!partial || input.validated === null || input.revalidate) && !input.in_progress) {
+									self.validate(key, skip_validators);
+								}
+								if (input.validated === false) {
+									all_ok = false;
+									if (self.validators_to_go === prev_validators) {
+										self.after_validators = null;
+										topElement = firstElement(element, topElement);
+										setTimeout( function() {
+											self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
+										}, self.options('validationMessageFlashDelay')*i++);
+									}
 								}
 							}
 						}
@@ -799,7 +803,7 @@ https://github.com/fra-iesus/tdp
 					if (typeof value === 'string') {
 						value = value.trim();
 						if (self._parameters.values[key].type === 'tel') {
-							value = value.replace(/ |-/g, '');
+							value = value.replace(/[ -]/g, '');
 						}
 					}
 					if (self._parameters.alwaysSubmit) {
