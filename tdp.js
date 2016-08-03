@@ -461,6 +461,7 @@ https://github.com/fra-iesus/tdp
 									later = true;
 									definition.validated = false;
 									self.validators_to_go++;
+									definition.in_progress = true;
 									var request = $.ajax({
 										url: entry.value,
 										type: 'POST',
@@ -518,6 +519,7 @@ https://github.com/fra-iesus/tdp
 										},
 										async: true
 									}).always(function () {
+										definition.in_progress = false;
 										self.hideValidationWorking(name);
 									});
 								}
@@ -747,10 +749,10 @@ https://github.com/fra-iesus/tdp
 						var element = self.getInput(key);
 						if (element.parent().is(":visible")) {
 							var prev_validators = self.validators_to_go;
-							if (!partial || input.validated === null || input.revalidate) {
+							if ((!partial || input.validated === null || input.revalidate) && !input.in_progress) {
 								self.validate(key, skip_validators);
 							}
-							if (input.validated === false) {
+							if (input.validated === false && !input.in_progress) {
 								all_ok = false;
 								if (self.validators_to_go === prev_validators) {
 									self.after_validators = null;
