@@ -465,21 +465,18 @@ https://github.com/fra-iesus/tdp
 											if (!result) {
 												definition.validated = true;
 												self.showValidationOk(name);
-												if (self.validators_to_go > 0) {
-													self.validators_to_go--;
-													if (self.validators_to_go === 0 && self.after_validators !== null) {
-														self.after_validators();
-														self.after_calidators = null;
-													}
+												self.validators_to_go--;
+												if (self.validators_to_go === 0 && self.after_validators !== null) {
+													self.after_validators();
+													self.after_calidators = null;
 												}
 											} else {
 												definition.validated = false;
 												self.showValidationMsg(name, result);
 												self.hideValidationOk(name);
-												if (self.validators_to_go > 0) {
-													self.validators_to_go--;
-													self.first_unvalidated = firstElement($input, self.first_unvalidated);
-												}
+												self.validators_to_go--;
+												self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												self.after_validators = null;
 												if (!self.validators_to_go) {
 													if (self.options('scrollToErrorEnabled')) {
 														$('html, body').animate({
@@ -487,18 +484,16 @@ https://github.com/fra-iesus/tdp
 														}, self.options('scrollToErrorDuration'));
 													}
 												}
-												self.after_validators = null;
 											}
 										},
 										error: function(data) {
 												definition.validated = false;
+												self.validators_to_go--;
+												self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												self.after_validators = null;
 												result = self.options('validationMessageProcessor')([entry.message]);
 												self.showValidationMsg(name, result);
 												self.hideValidationOk(name);
-												if (self.validators_to_go > 0) {
-													self.validators_to_go--;
-													self.first_unvalidated = firstElement($input, self.first_unvalidated);
-												}
 												if (!self.validators_to_go) {
 													if (self.options('scrollToErrorEnabled')) {
 														$('html, body').animate({
@@ -506,7 +501,6 @@ https://github.com/fra-iesus/tdp
 														}, self.options('scrollToErrorDuration'));
 													}
 												}
-												self.after_validators = null;
 										},
 										async: true
 									}).always(function () {
@@ -745,6 +739,7 @@ https://github.com/fra-iesus/tdp
 							if (input.validated === false) {
 								all_ok = false;
 								if (self.validators_to_go === prev_validators) {
+									self.after_validators = null;
 									topElement = firstElement(element, topElement);
 									setTimeout( function() {
 										self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
@@ -860,23 +855,18 @@ https://github.com/fra-iesus/tdp
 
 		// submit form
 		this.submitForm = function(ev) {
-			if (!self.revalidateAll(true)) {
-				if (self.validators_to_go > 0) {
-					self.after_validators = function() {
-						if (self.options('submitMethod') !== null) {
-							return self.options('submitMethod')(self);
-						} else {
-							return self.ajaxSubmit();
-						}
-					};
+			self.after_validators = function() {
+				if (self.options('submitMethod') !== null) {
+					return self.options('submitMethod')(self);
+				} else {
+					return self.ajaxSubmit();
 				}
-				if (ev !== null && typeof ev === 'object') {
-					ev.preventDefault();
-				}
-				return false;
-			}
+			};
 			if (ev !== null && typeof ev === 'object') {
 				ev.preventDefault();
+			}
+			if (!self.revalidateAll(true)) {
+				return false;
 			}
 			if (self.options('submitMethod') !== null) {
 				return self.options('submitMethod')(self);
