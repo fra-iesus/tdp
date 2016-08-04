@@ -551,7 +551,7 @@ https://github.com/fra-iesus/tdp
 					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
 						self.hideValidationMsg(name);
-						if (!skipped && !later && !(definition.match && !self._parameters.values[definition.match].validated) && !definition.in_progress) {
+						if (!skipped && !later && !(definition.match && !self._parameters.values[definition.match].validated)) {
 							self.showValidationOk(name);
 						} else {
 							self.hideValidationOk(name);
