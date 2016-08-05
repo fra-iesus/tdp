@@ -421,6 +421,7 @@ https://github.com/fra-iesus/tdp
 								var skip = false;
 								if ($.isArray(entry.value)) {
 									if (!self.getValue(entry.value[0]) || !self.getValue(entry.value[1]) || !self.getValue(entry.value[2])) {
+										console.log('skipped');
 										skip = true;
 									} else {
 										date = new Date(self.getValue(entry.value[0]), self.getValue(entry.value[1])-1, self.getValue(entry.value[2]));
@@ -653,7 +654,7 @@ https://github.com/fra-iesus/tdp
 						if (input.values) {
 							input.values.some(function(entry) {
 								var setting = [];
-								if( typeof entry === 'string' ) {
+								if( typeof entry === 'string' || typeof entry === 'number' ) {
 									setting = [entry, entry, false];
 								} else {
 									setting = [ entry[0], (entry.length > 1 ? entry[1] : entry[0]), (entry.length > 2 ? !entry[2] : false)];
@@ -678,7 +679,12 @@ https://github.com/fra-iesus/tdp
 							}
 							var index;
 							for (index = min; index * inc <= max * inc; index += inc ) {
-								input_element.append(createElement('option', index).attr("value",index));
+								var option = createElement('option', index).attr("value",index);
+								if (input.value == index) {
+									input_element.selectedIndex = -1;
+									option.attr("selected");
+								}
+								input_element.append(option);
 							}
 						}
 					}
