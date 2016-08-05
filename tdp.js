@@ -143,7 +143,15 @@ https://github.com/fra-iesus/tdp
 			} else {
 				element_position = element.parent().offset().top;
 			}
-			return ( !pos && pos !== 0 ? element_position : Math.min(pos, element_position) );
+			console.log('current position: ' + pos);
+			console.log('element position: ' + element_position);
+			if (pos === null) {
+				pos = element_position;
+			} else {
+				pos = Math.min(pos, element_position);
+			}
+			console.log('position: ' + pos);
+			return pos;
 		}
 
 		function escapeHtml(string) {
@@ -497,7 +505,7 @@ https://github.com/fra-iesus/tdp
 												}
 												self.hideValidationOk(name);
 												self.validators_to_go--;
-												self.first_unvalidated = firstElement($input.parent(), self.first_unvalidated);
+												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
 													if (self.options('scrollToErrorEnabled')) {
@@ -511,7 +519,7 @@ https://github.com/fra-iesus/tdp
 										error: function(data) {
 												definition.validated = false;
 												self.validators_to_go--;
-												self.first_unvalidated = firstElement($input.parent(), self.first_unvalidated);
+												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												result = self.options('validationMessageProcessor')([entry.message]);
 												self.showValidationMsg(name, result);
@@ -748,10 +756,10 @@ https://github.com/fra-iesus/tdp
 		});
 
 		this.revalidateAll = function(partial, skip_validators) {
-			var topElement = null;
 			var all_ok = true;
 			var i = 0;
 			var self = this;
+			self.first_unvalidated = null;
 			Object.keys(self._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
 				if (input.type !== 'hidden') {
@@ -769,7 +777,7 @@ https://github.com/fra-iesus/tdp
 									all_ok = false;
 									if (self.validators_to_go === prev_validators) {
 										self.after_validators = null;
-										topElement = firstElement(element.parent(), topElement);
+										self.first_unvalidated = firstElement(element.parent().children('label').length ? element.parent().children('label').first() : element, self.first_unvalidated);
 										setTimeout( function() {
 											self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 										}, self.options('validationMessageFlashDelay')*i++);
@@ -781,13 +789,11 @@ https://github.com/fra-iesus/tdp
 				}
 			});
 			if (!all_ok) {
-				if (topElement && self.options('scrollToErrorEnabled')) {
+				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
 						$('html, body').animate({
 							scrollTop: topElement
 						}, self.options('scrollToErrorDuration'));
-					} else {
-						self.first_unvalidated = topElement;
 					}
 				}
 				return false;
