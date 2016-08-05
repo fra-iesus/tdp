@@ -143,14 +143,11 @@ https://github.com/fra-iesus/tdp
 			} else {
 				element_position = element.parent().offset().top;
 			}
-			console.log('current position: ' + pos);
-			console.log('element position: ' + element_position);
 			if (pos === null) {
 				pos = element_position;
 			} else {
 				pos = Math.min(pos, element_position);
 			}
-			console.log('position: ' + pos);
 			return pos;
 		}
 
@@ -792,7 +789,7 @@ https://github.com/fra-iesus/tdp
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
 						$('html, body').animate({
-							scrollTop: topElement
+							scrollTop: self.first_unvalidated
 						}, self.options('scrollToErrorDuration'));
 					}
 				}
