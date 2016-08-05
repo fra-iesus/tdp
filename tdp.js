@@ -497,7 +497,7 @@ https://github.com/fra-iesus/tdp
 												}
 												self.hideValidationOk(name);
 												self.validators_to_go--;
-												self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												self.first_unvalidated = firstElement($input.parent(), self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
 													if (self.options('scrollToErrorEnabled')) {
@@ -511,7 +511,7 @@ https://github.com/fra-iesus/tdp
 										error: function(data) {
 												definition.validated = false;
 												self.validators_to_go--;
-												self.first_unvalidated = firstElement($input, self.first_unvalidated);
+												self.first_unvalidated = firstElement($input.parent(), self.first_unvalidated);
 												self.after_validators = null;
 												result = self.options('validationMessageProcessor')([entry.message]);
 												self.showValidationMsg(name, result);
@@ -769,7 +769,7 @@ https://github.com/fra-iesus/tdp
 									all_ok = false;
 									if (self.validators_to_go === prev_validators) {
 										self.after_validators = null;
-										topElement = firstElement(element, topElement);
+										topElement = firstElement(element.parent(), topElement);
 										setTimeout( function() {
 											self.options('validationMessageFlash')($(outerElement(self.options('validationMessageElement')) + '[name="' + key + '"]').first());
 										}, self.options('validationMessageFlashDelay')*i++);
