@@ -458,7 +458,7 @@ https://github.com/fra-iesus/tdp
 									}
 								} else {
 									skipped = true;
-									result = true;
+									result = false;
 								}
 								break;
 							case 'validator':
@@ -552,6 +552,8 @@ https://github.com/fra-iesus/tdp
 					});
 					if (!skipped && !later) {
 						definition.validated = (results.length === 0);
+					} else if (skipped) {
+						definition.validated = 0;
 					}
 					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
