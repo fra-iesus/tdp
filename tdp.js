@@ -694,6 +694,7 @@ https://github.com/fra-iesus/tdp
 					}
 					input_element.on('click', function() {
 						self.validate(key);
+						return true;
 					});
 				} else {
 					if (input.value) {
@@ -703,7 +704,9 @@ https://github.com/fra-iesus/tdp
 						self.validate(key, self.options('skipOnInput'));
 					});
 					input_element.on('change, blur', function() {
-						self.validate(key);
+						setTimeout(function () {
+							self.validate(key);
+						}, 100);
 					});
 				}
 				// 'enter' to submit form
@@ -927,7 +930,6 @@ https://github.com/fra-iesus/tdp
 			self.submitForm(ev);
 			return false;
 		});
-
 	};
 
 	$.fn.tdp = function(methodOrOptions) {
