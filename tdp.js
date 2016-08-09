@@ -464,7 +464,7 @@ https://github.com/fra-iesus/tdp
 							case 'validator':
 								if (value == definition.value && definition.prevalidated) {
 									result = true;
-								} else {
+								} else if (!definition.in_progress) {
 									self.hideValidationMsg(name);
 									self.hideValidationOk(name);
 									self.showValidationWorking(name);
