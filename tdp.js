@@ -421,7 +421,6 @@ https://github.com/fra-iesus/tdp
 								var skip = false;
 								if ($.isArray(entry.value)) {
 									if (!self.getValue(entry.value[0]) || !self.getValue(entry.value[1]) || !self.getValue(entry.value[2])) {
-										console.log('skipped');
 										skip = true;
 									} else {
 										date = new Date(self.getValue(entry.value[0]), self.getValue(entry.value[1])-1, self.getValue(entry.value[2]));
@@ -506,7 +505,7 @@ https://github.com/fra-iesus/tdp
 												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
-													if (self.options('scrollToErrorEnabled')) {
+													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 														$('html, body').animate({
 															scrollTop: self.first_unvalidated
 														}, self.options('scrollToErrorDuration'));
@@ -523,7 +522,7 @@ https://github.com/fra-iesus/tdp
 												self.showValidationMsg(name, result);
 												self.hideValidationOk(name);
 												if (!self.validators_to_go) {
-													if (self.options('scrollToErrorEnabled')) {
+													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 														$('html, body').animate({
 															scrollTop: self.first_unvalidated
 														}, self.options('scrollToErrorDuration'));
