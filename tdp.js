@@ -458,7 +458,7 @@ https://github.com/fra-iesus/tdp
 									}
 								} else {
 									skipped = true;
-									result = false;
+									result = true;
 								}
 								break;
 							case 'validator':
