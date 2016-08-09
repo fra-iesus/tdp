@@ -223,6 +223,9 @@ https://github.com/fra-iesus/tdp
 		};
 
 		this.showValidationMsg = function (name, msg) {
+			if (this._parameters.values[name].validation_element) {
+				name = this._parameters.values[name].validation_element;
+			}
 			var validation_msg_el = $(this._parameters.element).find(outerElement(this.options('validationMessageElement')) + '[name="' + name + '"]').first();
 			if (validation_msg_el) {
 				if (msg) {
@@ -233,6 +236,9 @@ https://github.com/fra-iesus/tdp
 			}
 		};
 		this.hideValidationMsg = function (name) {
+			if (this._parameters.values[name].validation_element) {
+				name = this._parameters.values[name].validation_element;
+			}
 			var validation_msg_el = $(this._parameters.element).find(outerElement(this.options('validationMessageElement')) + '[name="' + name + '"]').first();
 			if (validation_msg_el) {
 				this.options('validationMessageHide')(validation_msg_el);
@@ -430,7 +436,7 @@ https://github.com/fra-iesus/tdp
 								}
 								if (!skip) {
 									if (Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date.getTime())) {
-										// todo: add compatison for strings
+										// todo: add comparison for strings
 										if (entry.type === 'age') {
 											var age = +date;
 											result = ~~((Date.now() - age - 86400000) / (31557600000)) >= entry.value[3];
@@ -640,6 +646,10 @@ https://github.com/fra-iesus/tdp
 					} else if (entry.type === 'date') {
 						revalidate = true;
 						return;
+					} else if (entry.type === 'age') {
+						if ($.isArray(entry.value) && entry.value[0] != key) {
+							input.validation_element = entry.value[0];
+						}
 					}
 				});
 			}
