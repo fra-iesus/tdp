@@ -205,16 +205,16 @@ https://github.com/fra-iesus/tdp
 		//set value to input by input name
 		this.setValue = function (name, value) {
 			var input = this.getInput(name);
+			if (!input.length) {
+				console.warn('Element for input "' + name + '" does not exist');
+				return false;
+			}
 			if (input.attr('type') === 'radio' || input.attr('type') === 'checkbox') {
 				if (value) {
 					$(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
 				} else {
 					return $(this._parameters.element).find('input[name="' + name + '"]').first().prop( "checked", false );
 				}
-			}
-			if (!input.length) {
-				console.warn('Element for input "' + name + '" does not exist');
-				return false;
 			}
 			if (this._parameters.values[name].type === 'select') {
 				input.selectedIndex = -1;
@@ -303,7 +303,7 @@ https://github.com/fra-iesus/tdp
 				}
 			}
 			var $input = (input instanceof jQuery ? input : (typeof input === 'string' ? this.getInput(input) : $(input)));
-			if ( $input.is('input,textarea,select') ) {
+			if ( $input && $input.is('input,textarea,select') ) {
 				var self = this;
 				var name = $input.attr('name');
 				if ( name in self._parameters.values ) {
@@ -723,7 +723,9 @@ https://github.com/fra-iesus/tdp
 				if (!input_element.is('textarea')) {
 					input_element.keypress(function (e) {
 						if (e.which == 13) {
-							self.validate($(e.currentTarget).attr('name'));
+							if ($(e.currentTarget).length) {
+								self.validate($(e.currentTarget).attr('name'));
+							}
 							self.submitForm();
 							return false;
 						}
@@ -740,11 +742,11 @@ https://github.com/fra-iesus/tdp
 				var val_element = input_element;
 				if (input.type === 'radio') {
 					val_element = $el.find('input[name="' + key + '"]').last();
-					if (val_element.next('label[for="' + val_element.attr('id') + '"]').length) {
+					if (val_element.length && val_element.next('label[for="' + val_element.attr('id') + '"]').length) {
 						val_element = val_element.next('label[for="' + val_element.attr('id') + '"]');
 					}
 				}
-				if (!$el.find(getByOuterElement(self.options('validationMessageElement'), key)).length && !$el.find(getByOuterElement(self.options('validationOkElement'), key)).length) {
+				if (val_element.length && !$el.find(getByOuterElement(self.options('validationMessageElement'), key)).length && !$el.find(getByOuterElement(self.options('validationOkElement'), key)).length) {
 					val_element.after(createElement(self.options('validationMessageElement'), '').attr('name', key).hide()).
 						after(createElement(self.options('validationOkElement'), self.options('validationOkText')).attr('name', key).hide());
 				}
@@ -758,7 +760,7 @@ https://github.com/fra-iesus/tdp
 					});
 				}
 				if (has_validator) {
-					if (!$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
+					if (val_element.length && !$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 					}
 				}
