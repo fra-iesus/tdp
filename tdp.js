@@ -216,9 +216,6 @@ https://github.com/fra-iesus/tdp
 					return $(this._parameters.element).find('input[name="' + name + '"]').first().prop( "checked", false );
 				}
 			}
-			if (this._parameters.values[name].type === 'select') {
-				input.selectedIndex = -1;
-			}
 			return this.getInput(name).val(value);
 		};
 
@@ -676,7 +673,6 @@ https://github.com/fra-iesus/tdp
 									option.attr("disabled");
 								}
 								if (input.value == setting[1]) {
-									input_element.selectedIndex = -1;
 									option.attr("selected");
 								}
 								input_element.append(option);
@@ -693,7 +689,6 @@ https://github.com/fra-iesus/tdp
 							for (index = min; index * inc <= max * inc; index += inc ) {
 								var option = createElement('option', index).attr("value",index);
 								if (input.value == index) {
-									input_element.selectedIndex = -1;
 									option.attr("selected");
 								}
 								input_element.append(option);
