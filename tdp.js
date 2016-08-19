@@ -713,9 +713,15 @@ https://github.com/fra-iesus/tdp
 					if (input.value) {
 						self.setValue(key, input.value);
 					}
-					input_element.on('input', function() {
-						self.validate(key, self.options('skipOnInput'));
-					});
+					if (input.type === 'select') {
+						input_element.on('input', function() {
+							self.validate(key);
+						});
+					} else {
+						input_element.on('input', function() {
+							self.validate(key, self.options('skipOnInput'));
+						});
+					}
 					input_element.on('change, blur', function() {
 						setTimeout(function () {
 							self.validate(key);
