@@ -324,7 +324,9 @@ https://github.com/fra-iesus/tdp
 					}
 					if (definition.matches) {
 						definition.matches.some(function(entry) {
-							self.validate(entry);
+							if (self._parameters.values[entry].validated !== null) {
+								self.validate(entry);
+							}
 						});
 					}
 					var results = [];
