@@ -651,13 +651,12 @@ https://github.com/fra-iesus/tdp
 						self._parameters.values[match].matches.push(key);
 						revalidate = true;
 						return;
-					} else if (entry.type === 'date') {
+					} else if (entry.type === 'date' || entry.type === 'age') {
 						revalidate = true;
-						return;
-					} else if (entry.type === 'age') {
 						if ($.isArray(entry.value) && entry.value[0] != key) {
 							input.validation_element = entry.value[0];
 						}
+						return;
 					}
 				});
 			}
