@@ -341,7 +341,7 @@ https://github.com/fra-iesus/tdp
 							self.hideValidationMsg(name);
 							definition.validated = true;
 							return true;
-						} else {
+						} else if (!definition.empty) {
 							self.showValidationMsg(name, self.options('errorMessageEmptyInput'));
 							definition.validated = false;
 							return false;
