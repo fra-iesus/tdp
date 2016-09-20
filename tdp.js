@@ -451,7 +451,7 @@ https://github.com/fra-iesus/tdp
 												result = true;
 												if ($.isArray(entry.value)) {
 													var tmp_validated = definition.validated;
-													definition.validated = 1;
+													definition.validated = true;
 													entry.value.some(function(date_part) {
 														if (name != date_part && !self._parameters.values[date_part].validated) {
 															self.validate(date_part, skip_validators);
@@ -563,7 +563,7 @@ https://github.com/fra-iesus/tdp
 					if (!skipped && !later) {
 						definition.validated = (results.length === 0);
 					} else if (skipped) {
-						definition.validated = 0;
+						definition.validated = false;
 					}
 					var result = self.options('validationMessageProcessor')(results);
 					if (!result) {
@@ -930,6 +930,7 @@ https://github.com/fra-iesus/tdp
 			};
 			if (ev !== null && typeof ev === 'object') {
 				ev.preventDefault();
+				ev.stopPropagation();
 			}
 			if (!self.revalidateAll(true)) {
 				return false;
