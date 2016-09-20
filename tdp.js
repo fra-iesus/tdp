@@ -314,7 +314,7 @@ https://github.com/fra-iesus/tdp
 					}
 					if (definition.old_value !== null && value === definition.old_value) {
 						if (!definition.match && !definition.revalidate) {
-							return;
+							return definition.validated;
 						}
 					}
 					if (!skip_validators) {
@@ -467,7 +467,11 @@ https://github.com/fra-iesus/tdp
 										result = false;
 									}
 								} else {
-									skipped = true;
+									if (definition.empty) {
+										definition.validated = true;
+									} else {
+										skipped = true;
+									}
 									result = true;
 								}
 								break;
@@ -932,7 +936,7 @@ https://github.com/fra-iesus/tdp
 				ev.preventDefault();
 				ev.stopPropagation();
 			}
-			if (!self.revalidateAll(true)) {
+			if (!self.revalidateAll(false)) {
 				return false;
 			}
 			if (self.options('submitMethod') !== null) {
