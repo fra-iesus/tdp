@@ -735,7 +735,7 @@ https://github.com/fra-iesus/tdp
 						}
 						if (input_element.attr('type') === 'text' || input_element.attr('type') === 'tel') {
 							if (input_max) {
-								input_element.attr('maxlength', input_max+1);
+								input_element.attr('maxlength', (input.type === 'text' ? entry.value : entry.value.toString().length)+1);
 							}
 						}
 					}
