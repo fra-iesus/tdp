@@ -323,9 +323,11 @@ https://github.com/fra-iesus/tdp
 						definition.old_value = null;
 					}
 					if (definition.matches) {
+						// circular reference removal
+						definition.validated = null;
 						definition.matches.some(function(entry) {
 							if (self._parameters.values[entry].validated !== null) {
-								self.validate(entry);
+								self.validate(entry, skip_validators);
 							}
 						});
 					}
@@ -430,7 +432,7 @@ https://github.com/fra-iesus/tdp
 									val0 = self.getValue(entry.value[0]);
 									val1 = self.getValue(entry.value[1]);
 									val2 = self.getValue(entry.value[2]);
-									if (!val0 && !val1 && !val2) {
+									if (!val0 || !val1 || !val2) {
 										skip = true;
 									} else {
 										date = new Date(val0, val1-1, val2);
@@ -645,6 +647,8 @@ https://github.com/fra-iesus/tdp
 			input.old_value = null;
 			var match = false;
 			var revalidate = false;
+			var input_min = null;
+			var input_max = null;
 			if (input.conditions && input.conditions.length) {
 				input.conditions.some(function(entry) {
 					if (entry.type === 'match') {
@@ -661,6 +665,10 @@ https://github.com/fra-iesus/tdp
 							input.validation_element = entry.value[0];
 						}
 						return;
+					} else if (entry.type === 'min') {
+						input_min = entry.value;
+					} else if (entry.type === 'max') {
+						input_max = entry.value;
 					}
 				});
 			}
@@ -716,6 +724,21 @@ https://github.com/fra-iesus/tdp
 						return true;
 					});
 				} else {
+					if (input_min || input_max) {
+						if (input_element.attr('type') === 'number') {
+							if (input_min) {
+								input_element.attr('min', input_min);
+							}
+							if (input_max) {
+								input_element.attr('max', input_max);
+							}
+						}
+						if (input_element.attr('type') === 'text') {
+							if (input_max) {
+								input_element.attr('maxlength', input_max+1);
+							}
+						}
+					}
 					if (input.value) {
 						self.setValue(key, input.value);
 					}
