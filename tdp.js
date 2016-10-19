@@ -429,7 +429,6 @@ https://github.com/fra-iesus/tdp
 								break;
 							case 'date':
 							case 'age':
-								var date;
 								var skip = false;
 								var val0;
 								var val1;
@@ -438,7 +437,23 @@ https://github.com/fra-iesus/tdp
 									val0 = self.getValue(entry.value[0]);
 									val1 = self.getValue(entry.value[1]);
 									val2 = self.getValue(entry.value[2]);
-									if (!final_validation && (!val0 || !val1 || !val2)) {
+									if (!val0 || !val1 || !val2) {
+										if (final_validation) {
+											if (definition.empty) {
+												definition.validated = true;
+												result = true;
+											} else {
+												skipped = true;
+												result = false;
+											}
+										} else {
+											result = true;
+											if (definition.empty) {
+												definition.validated = true;
+											} else {
+												skipped = true;
+											}
+										}
 										skip = true;
 									} else {
 										date = new Date(val0, val1-1, val2);
@@ -473,13 +488,6 @@ https://github.com/fra-iesus/tdp
 										}
 									} else {
 										result = false;
-									}
-								} else {
-									result = true;
-									if (definition.empty) {
-										definition.validated = true;
-									} else {
-										skipped = true;
 									}
 								}
 								break;
@@ -752,16 +760,21 @@ https://github.com/fra-iesus/tdp
 						input_element.on('input', function() {
 							self.validate(key);
 						});
+						input_element.on('change', function() {
+							setTimeout(function () {
+								self.validate(key);
+							}, 100);
+						});
 					} else {
 						input_element.on('input', function() {
 							self.validate(key, self.options('skipOnInput'));
 						});
+						input_element.on('change, blur', function() {
+							setTimeout(function () {
+								self.validate(key);
+							}, 100);
+						});
 					}
-					input_element.on('change, blur', function() {
-						setTimeout(function () {
-							self.validate(key);
-						}, 100);
-					});
 				}
 				// 'enter' to submit form
 				if (!input_element.is('textarea')) {
