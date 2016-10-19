@@ -292,7 +292,7 @@ https://github.com/fra-iesus/tdp
 		};
 
 		// validate input
-		this.validate = function( input, skip_validators ) {
+		this.validate = function( input, skip_validators, final_validation ) {
 			if (typeof input === 'string') {
 				if (this._parameters.values[input].type === 'hidden') {
 					this._parameters.values[input].validated = true;
@@ -327,7 +327,7 @@ https://github.com/fra-iesus/tdp
 						definition.validated = null;
 						definition.matches.some(function(entry) {
 							if (self._parameters.values[entry].validated !== null) {
-								self.validate(entry, skip_validators);
+								self.validate(entry, skip_validators, final_validation);
 							}
 						});
 					}
@@ -378,10 +378,16 @@ https://github.com/fra-iesus/tdp
 								break;
 							case 'integer':
 								t1 = parseInt(value, 10);
+								if (t1 != value) {
+									t1 = null;
+								}
 								t2 = entry.value;
 								break;
 							case 'float':
 								t1 = parseFloat(value, 10);
+								if (t1 != value) {
+									t1 = null;
+								}
 								t2 = entry.value;
 								break;
 							case 'checkbox':
@@ -432,7 +438,7 @@ https://github.com/fra-iesus/tdp
 									val0 = self.getValue(entry.value[0]);
 									val1 = self.getValue(entry.value[1]);
 									val2 = self.getValue(entry.value[2]);
-									if (!val0 || !val1 || !val2) {
+									if (!final_validation && (!val0 || !val1 || !val2)) {
 										skip = true;
 									} else {
 										date = new Date(val0, val1-1, val2);
@@ -456,7 +462,7 @@ https://github.com/fra-iesus/tdp
 													definition.validated = true;
 													entry.value.some(function(date_part) {
 														if (name != date_part && !self._parameters.values[date_part].validated) {
-															self.validate(date_part, skip_validators);
+															self.validate(date_part, skip_validators, final_validation);
 														}
 													});
 													definition.validated = tmp_validated;
@@ -469,12 +475,12 @@ https://github.com/fra-iesus/tdp
 										result = false;
 									}
 								} else {
+									result = true;
 									if (definition.empty) {
 										definition.validated = true;
 									} else {
 										skipped = true;
 									}
-									result = true;
 								}
 								break;
 							case 'validator':
@@ -530,20 +536,20 @@ https://github.com/fra-iesus/tdp
 											}
 										},
 										error: function(data) {
-												definition.validated = false;
-												self.validators_to_go--;
-												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
-												self.after_validators = null;
-												result = self.options('validationMessageProcessor')([entry.message]);
-												self.showValidationMsg(name, result);
-												self.hideValidationOk(name);
-												if (!self.validators_to_go) {
-													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
-														$('html, body').animate({
-															scrollTop: self.first_unvalidated
-														}, self.options('scrollToErrorDuration'));
-													}
+											definition.validated = false;
+											self.validators_to_go--;
+											self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
+											self.after_validators = null;
+											result = self.options('validationMessageProcessor')([entry.message]);
+											self.showValidationMsg(name, result);
+											self.hideValidationOk(name);
+											if (!self.validators_to_go) {
+												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
+													$('html, body').animate({
+														scrollTop: self.first_unvalidated
+													}, self.options('scrollToErrorDuration'));
 												}
+											}
 										},
 										async: true
 									}).always(function () {
@@ -828,7 +834,7 @@ https://github.com/fra-iesus/tdp
 							} else {
 								var prev_validators = self.validators_to_go;
 								if ((!partial || input.validated === null || input.revalidate) && !input.in_progress) {
-									self.validate(key, skip_validators);
+									self.validate(key, skip_validators, true);
 								}
 								if (input.validated === false) {
 									all_ok = false;
