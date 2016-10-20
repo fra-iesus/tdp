@@ -337,7 +337,7 @@ https://github.com/fra-iesus/tdp
 					if (skip_validators) {
 						skipped = true;
 					}
-					if ( (typeof(value) === 'number' && isNaN(value)) || (value === undefined) || (value == null) || (value === '')) {
+					if ( (typeof(value) === 'number' && isNaN(value)) || (value == undefined) || (value == null) || (value == '')) {
 						self.hideValidationOk(name);
 						if (definition.empty && !definition.revalidate) {
 							self.hideValidationMsg(name);
@@ -379,14 +379,14 @@ https://github.com/fra-iesus/tdp
 							case 'integer':
 								t1 = parseInt(value, 10);
 								if (t1 != value) {
-									t1 = null;
+									t1 = undefined;
 								}
 								t2 = entry.value;
 								break;
 							case 'float':
 								t1 = parseFloat(value, 10);
 								if (t1 != value) {
-									t1 = null;
+									t1 = undefined;
 								}
 								t2 = entry.value;
 								break;
