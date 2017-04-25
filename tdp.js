@@ -344,7 +344,7 @@ https://github.com/fra-iesus/tdp
 							definition.validated = true;
 							return true;
 						} else if (!definition.empty) {
-							self.showValidationMsg(name, self.options('errorMessageEmptyInput'));
+							self.showValidationMsg(name, definition.empty_message ? definition.empty_message : self.options('errorMessageEmptyInput'));
 							definition.validated = false;
 							return false;
 						}
