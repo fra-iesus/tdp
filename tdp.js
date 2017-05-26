@@ -14,6 +14,7 @@ https://github.com/fra-iesus/tdp
 			errorMessageEmptyInput: 'Field is mandatory',
 			scrollToErrorDuration: 2000,
 			scrollToErrorEnabled: true,
+			scrollToErrorOffset: 0,
 			dialogShowDuration: 500,
 			dialogCloseDuration: 500,
 			dialogAutoclose: false,
@@ -537,7 +538,7 @@ https://github.com/fra-iesus/tdp
 												if (!self.validators_to_go) {
 													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 														$('html, body').animate({
-															scrollTop: self.first_unvalidated
+															scrollTop: self.first_unvalidated + self.options('scrollToErrorOffset')
 														}, self.options('scrollToErrorDuration'));
 													}
 												}
@@ -554,7 +555,7 @@ https://github.com/fra-iesus/tdp
 											if (!self.validators_to_go) {
 												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 													$('html, body').animate({
-														scrollTop: self.first_unvalidated
+														scrollTop: self.first_unvalidated + self.options('scrollToErrorOffset')
 													}, self.options('scrollToErrorDuration'));
 												}
 											}
@@ -868,7 +869,7 @@ https://github.com/fra-iesus/tdp
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
 						$('html, body').animate({
-							scrollTop: self.first_unvalidated
+							scrollTop: self.first_unvalidated + self.options('scrollToErrorOffset')
 						}, self.options('scrollToErrorDuration'));
 					}
 				}
