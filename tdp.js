@@ -292,6 +292,11 @@ https://github.com/fra-iesus/tdp
 			self.validators_to_go = 0;
 		};
 
+		this.resetAfterValidators = function () {
+			self.after_validators = null;
+			self.validators_to_go = 0;
+		};
+
 		// validate input
 		this.validate = function( input, skip_validators, final_validation ) {
 			if (typeof input === 'string') {
@@ -780,7 +785,7 @@ https://github.com/fra-iesus/tdp
 				// 'enter' to submit form
 				if (!input_element.is('textarea')) {
 					input_element.keypress(function (e) {
-						if (e.which == 13) {
+						if (e && e.which == 13) {
 							if ($(e.currentTarget).length) {
 								self.validate($(e.currentTarget).attr('name'));
 							}
@@ -878,7 +883,7 @@ https://github.com/fra-iesus/tdp
 			return true;
 		};
 
-		this.ajaxSubmit = function() {
+		this.getSubmitData = function() {
 			var self = this;
 			var submitData = {};
 			var updateNeeded = false;
@@ -919,6 +924,18 @@ https://github.com/fra-iesus/tdp
 					}
 				}
 			});
+
+			return {
+				'submitData': submitData,
+				'updateNeeded': updateNeeded
+			};
+		};
+
+		this.ajaxSubmit = function() {
+			var self = this;
+			var dataForSubmit = this.getSubmitData();
+			var submitData = dataForSubmit && dataForSubmit.submitData ? dataForSubmit.submitData : {};
+			var updateNeeded = dataForSubmit && dataForSubmit.updateNeeded !== undefined ? dataForSubmit.updateNeeded : false;
 			if ( !updateNeeded ) {
 				if (self._parameters.displayElement) {
 					$(self._parameters.element).hide(self.options('animationFastSpeed'));
