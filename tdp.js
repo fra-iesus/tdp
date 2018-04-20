@@ -53,7 +53,7 @@ https://github.com/fra-iesus/tdp
 			validatorRequestProcessor: function(value, params) {
 				return { data: value, params: params };
 			},
-			validatorResponseProcessor: function(data, name) {
+			validatorResponseProcessor: function(data, tdp, name) {
 				if (data) {
 					return data.response;
 				}
@@ -516,7 +516,7 @@ https://github.com/fra-iesus/tdp
 										timeout: self.options('submitTimeout'),
 										cache: false,
 										success: function(data) {
-											var message = self.options('validatorResponseProcessor')(data, name);
+											var message = self.options('validatorResponseProcessor')(data, self, name);
 											var result = false;
 											if (typeof message === 'string') {
 												result = self.options('validationMessageProcessor')([message]);
