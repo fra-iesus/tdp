@@ -129,8 +129,9 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- validation callbacks added
 - fixed checkboxes
-- added helpers wor working with validation elements (hide, show)
+- added helpers for working with validation elements (hide, show)
 - added methods reset and setValue
 - hidden inputs are not validated anymore
 - added notEmptyAsValidated parameter
