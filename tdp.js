@@ -1,6 +1,6 @@
 /*
 TDP - Tiny Dialogue Plugin
-Alexej Sidorenko, 2k16
+Alexej Sidorenko, 2k16-18
 https://github.com/fra-iesus/tdp
 */
 
@@ -297,6 +297,22 @@ https://github.com/fra-iesus/tdp
 			self.validators_to_go = 0;
 		};
 
+		this.validationCallback = function ( name, result ) {
+			if ( name in self._parameters.values ) {
+				var definition = self._parameters.values[name];
+				var callback = result ? 'success' : 'error';
+				var value = self.getValue(name);
+				if (typeof definition.validationCallbacks[callback] === "function") {
+					definition.validationCallbacks[callback](value, result, name);
+				}
+				if (typeof definition.validationCallbacks.always === "function") {
+					definition.validationCallbacks.always(value, result, name);
+				}
+			} else {
+				console.warn('Input "' + name + '" is not defined for validation');
+			}
+			return result;
+		};
 		// validate input
 		this.validate = function( input, skip_validators, final_validation ) {
 			if (typeof input === 'string') {
