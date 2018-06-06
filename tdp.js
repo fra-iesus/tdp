@@ -842,15 +842,15 @@ https://github.com/fra-iesus/tdp
 					if (val_element.length && !$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
 					}
-					// convert strings to functions in validation callbacks if needed
-					if (input.validationCallbacks) {
-						Object.keys(input.validationCallbacks).forEach(function(key) {
-							var callback = input.validationCallbacks[key];
-							if (typeof callback === 'string') {
-								input.validationCallbacks[key] = new Function("value", "result", "name", callback);
-							}
-						});
-					}
+				}
+				// convert strings to functions in validation callbacks if needed
+				if (input.validationCallbacks) {
+					Object.keys(input.validationCallbacks).forEach(function(key) {
+						var callback = input.validationCallbacks[key];
+						if (typeof callback === 'string') {
+							input.validationCallbacks[key] = new Function("value", "result", "name", callback);
+						}
+					});
 				}
 				self.hideValidationOk(key);
 				self.hideValidationMsg(key);
