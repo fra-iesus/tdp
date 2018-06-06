@@ -364,11 +364,11 @@ https://github.com/fra-iesus/tdp
 						if (definition.empty && !definition.revalidate) {
 							self.hideValidationMsg(name);
 							definition.validated = true;
-							return true;
+							return self.validationCallback(name, true);
 						} else if (!definition.empty) {
 							self.showValidationMsg(name, definition.empty_message ? definition.empty_message : self.options('errorMessageEmptyInput'));
 							definition.validated = false;
-							return false;
+							return self.validationCallback(name, false);
 						}
 					}
 					if (!definition.conditions || !definition.conditions.length) {
@@ -377,7 +377,7 @@ https://github.com/fra-iesus/tdp
 						if (self.options('notEmptyAsValidated')) {
 							self.showValidationOk(name);
 						}
-						return true;
+						return self.validationCallback(name, true);
 					}
 					definition.partial_error = false;
 					definition.conditions.some(function(entry) {
@@ -619,7 +619,7 @@ https://github.com/fra-iesus/tdp
 						self.showValidationMsg(name, result);
 						self.hideValidationOk(name);
 					}
-					return (!result);
+					return self.validationCallback(name, (!result));
 				} else {
 					console.warn('Input "' + name + '" is not defined for validation');
 				}
