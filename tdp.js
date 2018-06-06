@@ -302,10 +302,10 @@ https://github.com/fra-iesus/tdp
 				var definition = self._parameters.values[name];
 				var callback = result ? 'success' : 'error';
 				var value = self.getValue(name);
-				if (typeof definition.validationCallbacks[callback] === "function") {
+				if (definition.validationCallbacks && typeof definition.validationCallbacks[callback] === "function") {
 					definition.validationCallbacks[callback](value, result, name);
 				}
-				if (typeof definition.validationCallbacks.always === "function") {
+				if (definition.validationCallbacks && typeof definition.validationCallbacks.always === "function") {
 					definition.validationCallbacks.always(value, result, name);
 				}
 			} else {
@@ -841,6 +841,15 @@ https://github.com/fra-iesus/tdp
 				if (has_validator) {
 					if (val_element.length && !$el.find(getByOuterElement(self.options('validationWorkingElement'), key)).length) {
 						val_element.after(createElement(self.options('validationWorkingElement'), '').attr('name', key).hide());
+					}
+					// convert strings to functions in validation callbacks if needed
+					if (input.validationCallbacks) {
+						Object.keys(input.validationCallbacks).forEach(function(key) {
+							var callback = input.validationCallbacks[key];
+							if (typeof callback === 'string') {
+								input.validationCallbacks[key] = new Function("value", "result", "name", callback);
+							}
+						});
 					}
 				}
 				self.hideValidationOk(key);
