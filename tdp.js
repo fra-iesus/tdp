@@ -547,7 +547,7 @@ https://github.com/fra-iesus/tdp
 													self.after_validators();
 													self.after_validators = null;
 												}
-												self.validationCallback(name, true);
+												self.validationCallback(name, data);
 											} else {
 												definition.validated = false;
 												if (typeof result === 'string') {
