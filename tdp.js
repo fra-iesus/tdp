@@ -303,10 +303,10 @@ https://github.com/fra-iesus/tdp
 				var callback = result ? 'success' : 'error';
 				var value = self.getValue(name);
 				if (definition.validationCallbacks && typeof definition.validationCallbacks[callback] === "function") {
-					definition.validationCallbacks[callback](value, result, name);
+					definition.validationCallbacks[callback](value, result, name, self);
 				}
 				if (definition.validationCallbacks && typeof definition.validationCallbacks.always === "function") {
-					definition.validationCallbacks.always(value, result, name);
+					definition.validationCallbacks.always(value, result, name, self);
 				}
 			} else {
 				console.warn('Input "' + name + '" is not defined for validation');
@@ -850,7 +850,7 @@ https://github.com/fra-iesus/tdp
 					Object.keys(input.validationCallbacks).forEach(function(key) {
 						var callback = input.validationCallbacks[key];
 						if (typeof callback === 'string') {
-							input.validationCallbacks[key] = new Function("value", "result", "name", callback);
+							input.validationCallbacks[key] = new Function("value", "result", "name", "tdp", callback);
 						}
 					});
 				}
