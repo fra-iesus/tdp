@@ -547,6 +547,7 @@ https://github.com/fra-iesus/tdp
 													self.after_validators();
 													self.after_validators = null;
 												}
+												self.validationCallback(name, true);
 											} else {
 												definition.validated = false;
 												if (typeof result === 'string') {
@@ -563,6 +564,7 @@ https://github.com/fra-iesus/tdp
 														}, self.options('scrollToErrorDuration'));
 													}
 												}
+												self.validationCallback(name, false);
 											}
 										},
 										error: function(data) {
