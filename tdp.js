@@ -380,8 +380,12 @@ https://github.com/fra-iesus/tdp
 						return self.validationCallback(name, true);
 					}
 					definition.partial_error = false;
+					definition.fulfilled_conditions = [];
 					definition.conditions.some(function(entry) {
-						if (skip_validators && $.inArray(entry.type, skip_validators) > -1) {
+						if (
+							(skip_validators && $.inArray(entry.type, skip_validators) > -1) ||
+							(entry.conditioned && !definition.fulfilled_conditions[entry.conditioned])
+						) {
 							return false;
 						}
 						var result = true;
@@ -593,7 +597,11 @@ https://github.com/fra-iesus/tdp
 							default:
 								console.warn('Unknown condition type "' + entry.type + '"');
 						}
-						if (!result) {
+						if (entry.is_condition) {
+							if (result) {
+								definition.fulfilled_conditions[entry.is_condition] = true;
+							}
+						} else if (!result) {
 							if (!later) {
 								definition.partial_error = true;
 							}
