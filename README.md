@@ -23,6 +23,7 @@ Tiny Dialogue Plugin - jQuery Plugin for Forms processing and validation
 - date (test if entered date is valid one, eg. it's not 31st of February etc.)
 - age (test entered date for age - currently supported only for partial date inputs = year, month & day in separated inputs)
 - custom online validator (tests against defined online validator - good for email addresses)
+- conditioned validations (use 'is_condition':'name' ---> 'conditioned':'name' in condition definitions)
 
 ### A few words about possibilities:
 - supports multiple independent forms / dialogs on same page without any kind of interference
@@ -129,6 +130,7 @@ $('form#form01').tdp({
 
 ## HISTORY/CHANGELOG:
 
+- conditioned validations added (eg. input could be validated against email validator of phone number validator based on its content)
 - validation callbacks added
 - fixed checkboxes
 - added helpers for working with validation elements (hide, show)
