@@ -214,7 +214,7 @@ https://github.com/fra-iesus/tdp
 				if (value) {
 					$(this._parameters.element).find('input[name="' + name + '"]').filter('[value="' + value + '"]').first().prop( "checked", true );
 				} else {
-					return $(this._parameters.element).find('input[name="' + name + '"]').first().prop( "checked", false );
+					return $(this._parameters.element).find('input[name="' + name + '"]:checked').first().prop( "checked", false );
 				}
 			}
 			return this.getInput(name).val(value);
