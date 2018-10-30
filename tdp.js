@@ -98,6 +98,7 @@ https://github.com/fra-iesus/tdp
 		this._parameters.element = $el;
 		this.validators_to_go = 0;
 		this.after_validators = null;
+		this._fully_validated = false;
 
 		// options - getter/setter
 		this.options = function(options) {
@@ -290,6 +291,7 @@ https://github.com/fra-iesus/tdp
 			});
 			self.after_validators = null;
 			self.validators_to_go = 0;
+			self._fully_validated = false;
 		};
 
 		this.resetAfterValidators = function () {
@@ -315,6 +317,7 @@ https://github.com/fra-iesus/tdp
 		};
 		// validate input
 		this.validate = function( input, skip_validators, final_validation ) {
+			this._fully_validated = false;
 			if (typeof input === 'string') {
 				if (this._parameters.values[input].type === 'hidden') {
 					this._parameters.values[input].validated = true;
@@ -915,7 +918,12 @@ https://github.com/fra-iesus/tdp
 				}
 				return false;
 			}
+			self._fully_validated = true;
 			return true;
+		};
+
+		this.isValidated = function() {
+			return this._fully_validated;
 		};
 
 		this.getSubmitData = function() {
