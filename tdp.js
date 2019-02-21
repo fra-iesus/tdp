@@ -536,8 +536,9 @@ https://github.com/fra-iesus/tdp
 									var request = $.ajax({
 										url: entry.value,
 										type: 'POST',
-										data: self.options('validatorRequestProcessor')(value, entry.params),
+										data: JSON.stringify( self.options('validatorRequestProcessor')(value, entry.params) ),
 										dataType: 'json',
+										jsonp: false,
 										timeout: self.options('submitTimeout'),
 										cache: false,
 										success: function(data) {
@@ -1000,8 +1001,9 @@ https://github.com/fra-iesus/tdp
 			var request = $.ajax({
 				url: self.options('submitUrl'),
 				type: 'POST',
-				data: submitData,
+				data: JSON.stringify(submitData),
 				dataType: 'json',
+				jsonp: false,
 				timeout: self.options('submitTimeout'),
 				cache: false,
 				success: function(data) {
