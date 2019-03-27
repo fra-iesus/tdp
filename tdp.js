@@ -534,7 +534,7 @@ https://github.com/fra-iesus/tdp
 									self.validators_to_go++;
 									definition.in_progress = true;
 									var request = $.ajax({
-										url: entry.value,
+										url: entry.value + '?' + '_=' + new Date().getTime(),
 										type: 'POST',
 										data: JSON.stringify( self.options('validatorRequestProcessor')(value, entry.params) ),
 										dataType: 'json',
@@ -999,7 +999,7 @@ https://github.com/fra-iesus/tdp
 				$(self.options('submitLoadingElement')).show();
 			}
 			var request = $.ajax({
-				url: self.options('submitUrl'),
+				url: self.options('submitUrl') + '?' + '_=' + new Date().getTime(),
 				type: 'POST',
 				data: JSON.stringify(submitData),
 				dataType: 'json',
