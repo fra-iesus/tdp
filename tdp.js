@@ -568,9 +568,10 @@ https://github.com/fra-iesus/tdp
 												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
-													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
+													var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
+													if (self.options('scrollToErrorEnabled') && self.first_unvalidated && $(document).scrollTop() > topPosition) {
 														$('html, body').animate({
-															scrollTop: self.first_unvalidated + self.options('scrollToErrorOffset')
+															scrollTop: topPosition
 														}, self.options('scrollToErrorDuration'));
 													}
 												}
@@ -586,9 +587,10 @@ https://github.com/fra-iesus/tdp
 											self.showValidationMsg(name, result);
 											self.hideValidationOk(name);
 											if (!self.validators_to_go) {
-												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
+												var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
+												if (self.options('scrollToErrorEnabled') && self.first_unvalidated && $(document).scrollTop() > topPosition) {
 													$('html, body').animate({
-														scrollTop: self.first_unvalidated + self.options('scrollToErrorOffset')
+														scrollTop: topPosition
 													}, self.options('scrollToErrorDuration'));
 												}
 											}
