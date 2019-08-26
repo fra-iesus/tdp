@@ -12,7 +12,8 @@ https://github.com/fra-iesus/tdp
 			animationSpeed: 'slow',
 			animationFastSpeed: 'fast',
 			errorMessageEmptyInput: 'Field is mandatory',
-			scrollingElement:'body',
+			scrollingElement: 'body',
+			scrolledElement: 'body',
 			scrollToErrorDuration: 2000,
 			scrollToErrorEnabled: true,
 			scrollToErrorOffset: 0,
@@ -569,7 +570,7 @@ https://github.com/fra-iesus/tdp
 												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
-													var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
+													var topPosition = self.first_unvalidated - $(self.options('scrolledElement')).offset().top + self.options('scrollToErrorOffset');
 													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 														$(self.options('scrollingElement')).animate({
 															scrollTop: topPosition
@@ -588,7 +589,7 @@ https://github.com/fra-iesus/tdp
 											self.showValidationMsg(name, result);
 											self.hideValidationOk(name);
 											if (!self.validators_to_go) {
-												var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
+												var topPosition = self.first_unvalidated - $(self.options('scrolledElement')).offset().top + self.options('scrollToErrorOffset');
 												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 													$(self.options('scrollingElement')).animate({
 														scrollTop: topPosition
@@ -917,7 +918,12 @@ https://github.com/fra-iesus/tdp
 			if (!all_ok) {
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
-						var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
+						var topPosition = self.first_unvalidated - $(self.options('scrolledElement')).offset().top + self.options('scrollToErrorOffset');
+						console.log(self.first_unvalidated);
+						console.log(self.options('scrollToErrorOffset'));
+						console.log($(self.options('scrollingElement')).offset().top);
+						console.log($(self.options('scrolledElement')).offset().top);
+						console.log(topPosition);
 						$(self.options('scrollingElement')).animate({
 							scrollTop: topPosition
 						}, self.options('scrollToErrorDuration'));
