@@ -1,6 +1,6 @@
 /*
 TDP - Tiny Dialogue Plugin
-Alexej Sidorenko, 2k16-18
+Alexej Sidorenko, 2k16-19
 https://github.com/fra-iesus/tdp
 */
 
@@ -12,6 +12,7 @@ https://github.com/fra-iesus/tdp
 			animationSpeed: 'slow',
 			animationFastSpeed: 'fast',
 			errorMessageEmptyInput: 'Field is mandatory',
+			scrollingElement:'html, body',
 			scrollToErrorDuration: 2000,
 			scrollToErrorEnabled: true,
 			scrollToErrorOffset: 0,
@@ -570,7 +571,7 @@ https://github.com/fra-iesus/tdp
 												if (!self.validators_to_go) {
 													var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
 													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
-														$('html, body').animate({
+														$(self.options('scrollingElement')).animate({
 															scrollTop: topPosition
 														}, self.options('scrollToErrorDuration'));
 													}
@@ -589,7 +590,7 @@ https://github.com/fra-iesus/tdp
 											if (!self.validators_to_go) {
 												var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
 												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
-													$('html, body').animate({
+													$(self.options('scrollingElement')).animate({
 														scrollTop: topPosition
 													}, self.options('scrollToErrorDuration'));
 												}
@@ -917,7 +918,7 @@ https://github.com/fra-iesus/tdp
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
 						var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
-						$('html, body').animate({
+						$(self.options('scrollingElement')).animate({
 							scrollTop: topPosition
 						}, self.options('scrollToErrorDuration'));
 					}
