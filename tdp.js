@@ -569,7 +569,7 @@ https://github.com/fra-iesus/tdp
 												self.first_unvalidated = firstElement($input.parent().children('label').length ? $input.parent().children('label').first() : $input, self.first_unvalidated);
 												self.after_validators = null;
 												if (!self.validators_to_go) {
-													var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset') - $(self.options('scrollingElement')).position().top;
+													var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
 													if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 														$(self.options('scrollingElement')).animate({
 															scrollTop: topPosition
@@ -588,7 +588,7 @@ https://github.com/fra-iesus/tdp
 											self.showValidationMsg(name, result);
 											self.hideValidationOk(name);
 											if (!self.validators_to_go) {
-												var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset') - $(self.options('scrollingElement')).position().top;
+												var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
 												if (self.options('scrollToErrorEnabled') && self.first_unvalidated) {
 													$(self.options('scrollingElement')).animate({
 														scrollTop: topPosition
@@ -917,7 +917,7 @@ https://github.com/fra-iesus/tdp
 			if (!all_ok) {
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
-						var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset') - $(self.options('scrollingElement')).position().top;
+						var topPosition = self.first_unvalidated + self.options('scrollToErrorOffset');
 						$(self.options('scrollingElement')).animate({
 							scrollTop: topPosition
 						}, self.options('scrollToErrorDuration'));
