@@ -791,7 +791,7 @@ https://github.com/fra-iesus/tdp
 						}
 						if (input_element.attr('type') === 'text' || input_element.attr('type') === 'tel') {
 							if (input_max) {
-								input_element.attr('maxlength', (input.type === 'text' ? input_max : input_max.toString().length)+1);
+								input_element.attr('maxlength', ((input.type === 'text' || input.type === 'email') ? input_max : input_max.toString().length)+1);
 							}
 						}
 					}
@@ -919,11 +919,6 @@ https://github.com/fra-iesus/tdp
 				if (self.first_unvalidated && self.options('scrollToErrorEnabled')) {
 					if (!self.validators_to_go) {
 						var topPosition = self.first_unvalidated - $(self.options('scrolledElement')).offset().top + self.options('scrollToErrorOffset');
-						console.log(self.first_unvalidated);
-						console.log(self.options('scrollToErrorOffset'));
-						console.log($(self.options('scrollingElement')).offset().top);
-						console.log($(self.options('scrolledElement')).offset().top);
-						console.log(topPosition);
 						$(self.options('scrollingElement')).animate({
 							scrollTop: topPosition
 						}, self.options('scrollToErrorDuration'));
