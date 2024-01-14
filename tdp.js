@@ -1,6 +1,6 @@
 /*
 TDP - Tiny Dialogue Plugin
-Alexej Sidorenko, 2k16-19
+Alexej Sidorenko, 2k16-24
 https://github.com/fra-iesus/tdp
 */
 
@@ -276,10 +276,13 @@ https://github.com/fra-iesus/tdp
 			}
 		};
 
-		this.reset = function () {
+		this.reset = function (new_values = null) {
 			var self = this;
 			Object.keys(this._parameters.values).forEach(function(key) {
 				var input = self._parameters.values[key];
+				if (new_values && key in new_values) {
+					input.value = new_values[key];
+				}
 				if (input.type !== 'hidden') {
 					input.validated = null;
 					input.partial_error = false;
@@ -791,7 +794,7 @@ https://github.com/fra-iesus/tdp
 						}
 						if (input_element.attr('type') === 'text' || input_element.attr('type') === 'tel') {
 							if (input_max) {
-								input_element.attr('maxlength', ((input.type === 'text' || input.type === 'email') ? input_max : input_max.toString().length)+1);
+								input_element.attr('maxlength', (input.type === 'text' ? input_max : input_max.toString().length)+1);
 							}
 						}
 					}
