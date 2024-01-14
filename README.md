@@ -143,6 +143,7 @@ $('form#form01').tdp({
 - added 'empty' attribute for input
 - fixed radios processing
 - better work with elements on page with multiple forms
+- added option to pass new values to the reset() function
 
 ### 1.1
 2016-06-30
