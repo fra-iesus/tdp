@@ -196,9 +196,13 @@ https://github.com/fra-iesus/tdp
 			}
 			var element = this.getInput(name);
 			if (element) {
-				if (element.attr('type') === 'radio' || element.attr('type') === 'checkbox') {
+				if (element.attr('type') === 'radio') {
 					if (!element.prop("checked")) {
 						return '';
+					}
+				} else if (element.attr('type') === 'checkbox') {
+					if (!element.prop("checked")) {
+						return 0;
 					}
 				}
 				return element.val();
